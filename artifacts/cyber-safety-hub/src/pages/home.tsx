@@ -31,7 +31,7 @@ const FEATURES = [
   {
     icon: Zap, title: "Threat Dashboard",
     desc: "Track emerging scam trends in your region and stay one step ahead with live community data.",
-    points: ["Real-time scam trend charts", "XP & achievement system", "Personalised safety tips"],
+    points: ["Real-time scam trend charts", "Location-based alerts", "Personalised safety tips"],
     href: "/dashboard", cta: "Open Dashboard",
   },
 ];
@@ -93,11 +93,11 @@ export default function Home() {
           style={{
             background:
               "linear-gradient(to bottom," +
-              "rgba(15,10,30,0.85) 0%," +
-              "rgba(15,10,30,0.2) 30%," +
-              "rgba(15,10,30,0.1) 55%," +
-              "rgba(15,10,30,0.7) 82%," +
-              "rgba(15,10,30,0.95) 100%)",
+              "rgba(0,0,0,0.78) 0%," +
+              "rgba(0,0,0,0.12) 30%," +
+              "rgba(0,0,0,0.05) 55%," +
+              "rgba(0,0,0,0.70) 82%," +
+              "rgba(0,0,0,0.92) 100%)",
           }}
         />
 
@@ -137,6 +137,15 @@ export default function Home() {
             <Shield className="w-3.5 h-3.5" />
             National Cyber Awareness Initiative
           </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease } } }}
+            className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white mb-6 uppercase"
+          >
+            Think Before <br />
+            <span className="text-primary">You Click</span>
+          </motion.h1>
         </motion.div>
 
         {/* ── SPACER ── */}

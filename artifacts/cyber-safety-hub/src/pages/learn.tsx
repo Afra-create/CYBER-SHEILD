@@ -98,6 +98,18 @@ const QUIZ_DATA: Record<string, {
       },
       {
         id: 2,
+        question: "You receive a message saying your electricity bill is unpaid and your power will be cut tonight unless you share the OTP sent to your phone. What is this?",
+        options: [
+          "A helpful reminder from the utility company.",
+          "A common OTP scam designed to gain access to your payment apps.",
+          "A standard procedure for bill verification.",
+          "An automated system error you should comply with."
+        ],
+        correctAnswer: 1,
+        explanation: "Utility companies never threaten immediate disconnection via SMS or ask for OTPs to settle bills. This is a scam."
+      },
+      {
+        id: 3,
         question: "What does OTP stand for?",
         options: [
           "Open Transfer Protocol",
@@ -109,7 +121,19 @@ const QUIZ_DATA: Record<string, {
         explanation: "OTP is a One-Time Password used as a second layer of security."
       },
       {
-        id: 3,
+        id: 4,
+        question: "A stranger sends you a small amount of money by 'mistake' via UPI and then calls asking for the OTP you just received to 'reverse' the transaction. What should you do?",
+        options: [
+          "Share the OTP to return their money.",
+          "Tell them the OTP but change your PIN immediately.",
+          "Never share the OTP; ask them to contact their bank for a reversal.",
+          "Ignore the call but send the money back yourself."
+        ],
+        correctAnswer: 2,
+        explanation: "This is a 'Reverse Sweep' scam. The OTP they are asking for is likely to authorize a large deduction from your account."
+      },
+      {
+        id: 5,
         question: "You receive an OTP for a transaction you didn't initiate. What should you do?",
         options: [
           "Delete the message and ignore it.",
@@ -119,30 +143,6 @@ const QUIZ_DATA: Record<string, {
         ],
         correctAnswer: 1,
         explanation: "Receiving an unexpected OTP means someone already has your password or card details. Alert your bank immediately."
-      },
-      {
-        id: 4,
-        question: "Is it safe to store your ATM PIN or NetBanking password in your phone's contacts or notes?",
-        options: [
-          "Yes, as long as the phone has a screen lock.",
-          "No, if your phone is stolen or hacked, these details are easily found.",
-          "Yes, if you save it under a fake name.",
-          "Yes, phones are 100% secure."
-        ],
-        correctAnswer: 1,
-        explanation: "Hackers and malware often target notes and contacts. Use a dedicated, encrypted password manager instead."
-      },
-      {
-        id: 5,
-        question: "Which of the following is the most secure way to handle a suspicious call asking for bank details?",
-        options: [
-          "Argue with the caller.",
-          "Hang up and call your bank's official customer care number yourself.",
-          "Give fake details to confuse them.",
-          "Listen to them to find out more about the scam."
-        ],
-        correctAnswer: 1,
-        explanation: "Hanging up and initiating the call yourself to a verified number is the only way to ensure you're talking to the real bank."
       }
     ]
   },
