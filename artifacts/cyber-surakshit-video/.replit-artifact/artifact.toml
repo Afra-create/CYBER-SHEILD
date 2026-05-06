@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/cyber-surakshit-video/"
+title = "Har Ghar Cyber Surakshit - Animation"
+version = "1.0.0"
+id = "artifacts/cyber-surakshit-video"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/cyber-surakshit-video/" ]
+localPort = 24856
+
+[services.development]
+run = "pnpm --filter @workspace/cyber-surakshit-video run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cyber-surakshit-video", "run", "build" ]
+publicDir = "artifacts/cyber-surakshit-video/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24856"
+BASE_PATH = "/cyber-surakshit-video/"
