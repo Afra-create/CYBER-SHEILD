@@ -6,32 +6,44 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="w-full flex-1 bg-background relative overflow-hidden">
-      {/* Background Cyber Effect */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 cyber-grid cyber-flow-anim opacity-30"></div>
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px]"></div>
-      </div>
+    <div className="w-full flex-1 bg-background">
 
-      <div className="container mx-auto px-4 relative z-10 pt-20 pb-24 md:pt-32 md:pb-40">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* ── HERO SECTION with animated background ── */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+
+        {/* Animated video background — iframe pointing to the animation artifact */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <iframe
+            src="/cyber-surakshit-video/"
+            title="Har Ghar Cyber Surakshit Animation"
+            className="w-full h-full border-0"
+            style={{ display: "block" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Dark gradient overlay so text is readable */}
+        <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+
+        {/* Hero content */}
+        <div className="relative z-20 container mx-auto px-4 pt-24 pb-32 md:pt-36 md:pb-48 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm mb-6 border border-primary/20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary font-medium text-sm mb-6 border border-primary/30 backdrop-blur-sm">
               <Shield className="w-4 h-4" />
               <span>National Cyber Awareness Initiative</span>
             </div>
-            
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-              <span className="text-foreground">Think Before You </span>
+
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-2xl">
+              <span className="text-white">Think Before You </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Click</span>
             </h1>
-            
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+
+            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow">
               Empowering Indian families to recognize, resist, and report digital threats. Join thousands of citizens making the internet a safer place for everyone.
             </p>
 
@@ -43,7 +55,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/report">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg h-14 px-8 border-border bg-background/50 backdrop-blur">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg h-14 px-8 border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20">
                   Report a Scam
                   <AlertTriangle className="ml-2 w-5 h-5 text-destructive" />
                 </Button>
@@ -52,9 +64,16 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Stats Section */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-24"
+        {/* Bottom fade into the rest of the page */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 z-20 pointer-events-none bg-gradient-to-t from-background to-transparent" />
+      </section>
+
+      {/* ── STATS + FEATURES — normal background below ── */}
+      <div className="container mx-auto px-4 pb-24 relative z-10">
+
+        {/* Stats */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto -mt-8"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -66,7 +85,7 @@ export default function Home() {
             <div className="text-4xl font-bold text-foreground mb-2">142K+</div>
             <div className="text-sm text-muted-foreground">Citizens Trained</div>
           </div>
-          
+
           <div className="bg-card/50 backdrop-blur border border-border/50 rounded-2xl p-6 text-center shadow-sm">
             <div className="w-12 h-12 mx-auto bg-destructive/10 rounded-full flex items-center justify-center mb-4">
               <AlertTriangle className="w-6 h-6 text-destructive" />
