@@ -1,0 +1,138 @@
+Build a modern, responsive frontend for a "Cyber Safety & Awareness Hub" web application using React (or Next.js) and Tailwind CSS.
+
+The application should focus on educating users about cyber scams, helping them recognize threats, and allowing them to report suspicious activity. The UI should feel professional, interactive, and trustworthy, with subtle modern design elements (not overly flashy).
+
+🎯 Core Objective:
+Create a platform that trains users to identify scams through guided learning and interactive experiences, while also introducing a premium upgrade system for advanced training.
+
+---
+
+🎨 Design Style:
+
+* Clean and modern UI with subtle cyber theme
+* Use soft dark/light mode with alert colors (red/orange for threats, green for safe)
+* Smooth animations and micro-interactions using Framer Motion
+* Focus on clarity, readability, and structured layout
+
+---
+
+📱 Pages & Components:
+
+1. Landing Page:
+
+* Hero section with headline: "Think Before You Click"
+* Subtext explaining cyber awareness importance
+* CTA buttons: "Start Learning" and "Report a Scam"
+* Display dummy stats (e.g., scams reported, users trained)
+
+---
+
+2. Learning Modules Page:
+
+* Card-based layout for topics:
+
+  * Phishing
+  * OTP scams
+  * Job fraud
+  * Payment scams
+* Each card shows title, difficulty, and progress bar
+* Clicking a module opens a detailed view with:
+
+  * Explanation
+  * Real-world examples (fake messages/emails)
+  * Highlighted red flags
+  * Short quiz section
+
+---
+
+3. Scam Awareness Trainer:
+
+* Interactive UI showing a fake scam message (chat/email style)
+* Allow users to click/select suspicious parts of the message
+* Show feedback:
+
+  * Correct: highlight in green with explanation
+  * Incorrect: show missed clues
+* Add multiple scenarios
+
+---
+
+4. Reporting System:
+
+* Form UI with:
+
+  * Text input or message paste
+  * Category selection (phishing, job scam, etc.)
+  * Image upload (UI only)
+* Show success message after submission
+* Display a list of recent reports (dummy data)
+
+---
+
+5. Dashboard:
+
+* Show:
+
+  * Number of reports (dummy data)
+  * Trending scam types (bar or pie chart)
+  * "Tip of the Day"
+* Use simple charts (Chart.js or similar)
+
+---
+
+6. Subscription / Upgrade System (UI ONLY):
+
+* Add a "Upgrade to Pro" button in navbar
+
+* Free Tier: access to basic modules and trainer
+
+* Pro Tier (UI simulation only):
+
+  * Advanced scam scenarios
+  * Personal safety score display
+  * Advanced learning modules (locked for free users)
+
+* Show locked premium features with blur/lock icon
+
+* Add modal:
+  "Upgrade your defense level to access advanced threat training"
+
+* No real payment integration required
+
+---
+
+7. Gamification Elements:
+
+* XP progress bar in navbar
+* Badge system (e.g., Beginner, Defender, Expert)
+* Show progress visually
+
+---
+
+8. Multi-language Toggle:
+
+* Simple toggle UI (no backend logic required)
+
+---
+
+⚙️ Technical Requirements:
+
+* Use React or Next.js
+* Use Tailwind CSS
+* Use Framer Motion for animations
+* Use reusable components and clean folder structure
+* Fully responsive (mobile + desktop)
+
+---
+
+💡 Important Guidelines:
+
+* Do NOT implement backend logic
+* Use dummy/static data where needed
+* Prioritize user learning experience over visual complexity
+* Keep UI intuitive and easy to navigate
+
+---
+
+🎯 End Goal:
+The final UI should feel like a structured cyber training platform that helps users learn, practice, and improve their awareness of scams, while offering a clear upgrade path for advanced learning.
