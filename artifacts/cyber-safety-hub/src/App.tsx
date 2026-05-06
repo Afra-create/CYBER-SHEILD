@@ -19,20 +19,15 @@ const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <>
-      <CyberMatrixHero />
-      <AppLayout>
-        <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/learn" component={Learn} />
-        <Route path="/trainer" component={Trainer} />
-        <Route path="/report" component={Report} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/signup" component={Signup} />
-        <Route component={NotFound} />
-        </Switch>
-      </AppLayout>
-    </>
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/learn" component={Learn} />
+      <Route path="/trainer" component={Trainer} />
+      <Route path="/report" component={Report} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/signup" component={Signup} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
@@ -41,9 +36,10 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="cyber-safety-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <CyberMatrixHero />
+          <AppLayout>
             <Router />
-          </WouterRouter>
+          </AppLayout>
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

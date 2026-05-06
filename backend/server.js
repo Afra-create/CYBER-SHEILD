@@ -68,6 +68,44 @@ const mockDashboardData = {
   ]
 };
 
+// Serve a placeholder for the video animation to avoid 404 in iframe
+app.get('/cyber-surakshit-video', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { 
+            margin: 0; 
+            background: black; 
+            color: #0f0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+          }
+          .glitch { animation: glitch 1s infinite; }
+          @keyframes glitch {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="glitch">Cyber Shield Animation Loading...</div>
+      </body>
+    </html>
+  `);
+});
+
+app.get('/cyber-surakshit-video/', (req, res) => {
+  res.redirect('/cyber-surakshit-video');
+});
+
 // --- API ROUTES ---
 
 // Root route

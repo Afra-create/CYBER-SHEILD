@@ -9,12 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-<<<<<<< HEAD
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
-=======
 import { BackButton } from "@/components/ui/back-button";
->>>>>>> 9f5061561ed708a761583662bc60cad5cdfdfd77
 
 const SCAM_TRENDS_DATA = [
   { name: 'Mon', Phishing: 4000, OTP: 2400, Job: 2400 },
@@ -111,112 +108,8 @@ export default function Dashboard() {
                 <BookOpen className="w-6 h-6 text-blue-500" />
               </div>
               <div>
-<<<<<<< HEAD
-                <p className="text-sm font-medium text-muted-foreground mb-1">Your Level</p>
-                <h3 className="text-2xl font-bold text-primary flex items-center gap-2">
-                  <Shield className="w-6 h-6" /> {userStats?.level || 'Citizen'}
-                </h3>
-              </div>
-              <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                <Award className="w-5 h-5 text-primary" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="flex justify-between text-xs font-medium mb-1.5">
-                <span>{userStats?.xp || 0} XP</span>
-                <span className="text-muted-foreground">{userStats?.xpToNext || 500} XP to Expert</span>
-              </div>
-              <Progress value={userStats ? (userStats.xp / userStats.xpToNext) * 100 : 0} className="h-2 bg-primary/20" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center shrink-0">
-              <BookOpen className="w-6 h-6 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Modules Completed</p>
-              <h3 className="text-2xl font-bold">{userStats?.modulesCompleted || 0} / {userStats?.totalModules || 12}</h3>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-6 h-6 text-destructive" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Scams Reported</p>
-              <h3 className="text-2xl font-bold">{userStats?.reportsSubmitted || 0}</h3>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center shrink-0">
-              <Activity className="w-6 h-6 text-green-500" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Community Rank</p>
-              <h3 className="text-2xl font-bold pl-1">Top 15%</h3>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Charts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Live Scam Trends in Your Region
-              </CardTitle>
-              <CardDescription>Daily volume of reported scam categories (Last 7 days)</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={scamTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  />
-                  <Bar dataKey="OTP" stackId="a" fill="hsl(var(--destructive))" radius={[0, 0, 4, 4]} />
-                  <Bar dataKey="Phishing" stackId="a" fill="hsl(var(--primary))" />
-                  <Bar dataKey="Job" stackId="a" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Reporting Impact</CardTitle>
-              <CardDescription>Monthly reports submitted by you</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={reportsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                  />
-                  <Line type="monotone" dataKey="reports" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ fill: 'hsl(var(--primary))', r: 4 }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
-=======
-                <p className="text-sm font-medium text-muted-foreground">Modules Completed</p>
-                <h3 className="text-2xl font-bold">4 / 12</h3>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Modules Completed</p>
+                <h3 className="text-2xl font-bold">{userStats?.modulesCompleted || 0} / {userStats?.totalModules || 12}</h3>
               </div>
             </CardContent>
           </Card>
@@ -228,7 +121,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Scams Reported</p>
-                <h3 className="text-2xl font-bold">3</h3>
+                <h3 className="text-2xl font-bold">{userStats?.reportsSubmitted || 0}</h3>
               </div>
             </CardContent>
           </Card>
@@ -242,14 +135,12 @@ export default function Dashboard() {
                 <p className="text-sm font-medium text-muted-foreground">Community Rank</p>
                 <h3 className="text-2xl font-bold pl-1">Top 15%</h3>
               </div>
->>>>>>> 9f5061561ed708a761583662bc60cad5cdfdfd77
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            {/* Charts */}
             <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-xl overflow-hidden">
               <CardHeader className="border-b border-white/5 bg-white/5">
                 <CardTitle className="flex items-center gap-2">
@@ -260,7 +151,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="h-[300px] w-full pt-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={SCAM_TRENDS_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={scamTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
@@ -283,7 +174,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="h-[200px] w-full pt-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={REPORTS_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <LineChart data={reportsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
