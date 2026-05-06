@@ -1,0 +1,221 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import OpenAI from 'openai';
+import { initializeApp, cert } from 'firebase-admin/app.js';
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase-admin/firestore.js';
+import { getAuth } from 'firebase-admin/auth.js';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const PORT = process.env.PORT || 5000;
+
+// Initialize Firebase Admin
+let db, auth;
+try {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+  if (Object.keys(serviceAccount).length > 0) {
+    initializeApp({ credential: cert(serviceAccount) });
+    db = getFirestore();
+    auth = getAuth();
+    console.log('Firebase initialized successfully');
+  }
+} catch (error) {
+  console.warn('Firebase initialization failed:', error.message);
+}
+
+// Initialize OpenAI (Requires OPENAI_API_KEY in .env)
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || 'dummy_key_to_prevent_crash_if_missing',
+});
+
+// In-memory mock database for fallback (when Firebase is not available)
+const mockDatabase = {
+  users: {},
+  reports: [],
+  alerts: [
+    { id: 1, type: 'SMS', message: 'High volume of fake delivery SMS reported in your area.', date: new Date().toISOString(), severity: 'high' },
+    { id: 2, type: 'Email', message: 'Phishing campaign targeting bank customers.', date: new Date(Date.now() - 86400000).toISOString(), severity: 'medium' }
+  ],
+  lessons: [],
+  trainerScenarios: [],
+  userProgress: {}
+};
+
+const mockUserProgress = {
+  level: 'Defender',
+  xp: 240,
+  xpToNext: 500,
+  badges: ['First Report', 'Quick Learner'],
+  completedModules: ['phishing-basics', 'otp-fraud', 'social-engineering', 'password-security'],
+  streak: 7
+};
+
+const mockDashboardData = {
+  userStats: {
+    level: 'Defender',
+    xp: 240,
+    xpToNext: 500,
+    modulesCompleted: 4,
+    totalModules: 12,
+    reportsSubmitted: 3
+  },
+  scamTrends: [
+    { name: 'Mon', Phishing: 4000, OTP: 2400, Job: 2400 },
+    { name: 'Tue', Phishing: 3000, OTP: 1398, Job: 2210 },
+    { name: 'Wed', Phishing: 2000, OTP: 9800, Job: 2290 },
+    { name: 'Thu', Phishing: 2780, OTP: 3908, Job: 2000 },
+    { name: 'Fri', Phishing: 1890, OTP: 4800, Job: 2181 },
+    { name: 'Sat', Phishing: 2390, OTP: 3800, Job: 2500 },
+    { name: 'Sun', Phishing: 3490, OTP: 4300, Job: 2100 },
+  ],
+  reportsData: [
+    { month: 'Jan', reports: 120 },
+    { month: 'Feb', reports: 150 },
+    { month: 'Mar', reports: 220 },
+    { month: 'Apr', reports: 180 },
+    { month: 'May', reports: 290 },
+    { month: 'Jun', reports: 350 },
+  ]
+};
+
+// Serve static files for cyber-safety-hub (frontend)
+const hubDistPath = path.resolve(__dirname, '../artifacts/cyber-safety-hub/dist/public');
+app.use(express.static(hubDistPath));
+
+// Serve static files for cyber-surakshit-video
+const videoDistPath = path.resolve(__dirname, '../artifacts/cyber-surakshit-video/dist/public');
+app.use('/cyber-surakshit-video', express.static(videoDistPath));
+
+// --- API ROUTES ---
+
+// 1. Health Check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'CyberSafe Hub Backend is running.' });
+});
+
+// 2. Scam Message Scanner
+app.post('/api/scan', async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: 'Text or URL is required for scanning.' });
+
+  try {
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'You are a cybersecurity expert. Analyze the following text/URL and determine if it is a scam. Respond with a JSON object containing "isScam" (boolean), "threatLevel" (Low, Medium, High), and "analysis" (a brief explanation).' },
+          { role: 'user', content: text }
+        ],
+        response_format: { type: 'json_object' }
+      });
+      const result = JSON.parse(response.choices[0].message.content);
+      return res.json(result);
+    } else {
+      const isScam = text.toLowerCase().includes('urgent') || text.toLowerCase().includes('win') || text.toLowerCase().includes('http');
+      res.json({
+        isScam,
+        threatLevel: isScam ? 'High' : 'Low',
+        analysis: isScam ? 'This message contains suspicious keywords typical of phishing attempts.' : 'No immediate threats detected, but always stay vigilant.',
+        source: 'Mock Scanner'
+      });
+    }
+  } catch (error) {
+    console.error('Scan Error:', error);
+    res.status(500).json({ error: 'Failed to analyze the message.' });
+  }
+});
+
+// 3. AI Chatbot Assistant
+app.post('/api/chat', async (req, res) => {
+  const { message, history = [] } = req.body;
+  if (!message) return res.status(400).json({ error: 'Message is required.' });
+
+  try {
+    if (process.env.OPENAI_API_KEY) {
+      const messages = [
+        { role: 'system', content: 'You are a helpful cybersecurity assistant named CyberSafe AI. You help users identify scams, explain security concepts simply, and provide actionable advice. Keep answers concise.' },
+        ...history,
+        { role: 'user', content: message }
+      ];
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages
+      });
+      res.json({ reply: response.choices[0].message.content });
+    } else {
+      res.json({ reply: `(Mock Mode) I understand you asked: "${message}". As an AI, I suggest verifying the sender's identity before clicking any links.`, source: 'Mock Chatbot' });
+    }
+  } catch (error) {
+    console.error('Chat Error:', error);
+    res.status(500).json({ error: 'Chatbot failed to respond.' });
+  }
+});
+
+// 4. Submit Scam Report
+app.post('/api/reports', async (req, res) => {
+  const { type, content, description, userEmail } = req.body;
+  if (!content || !type) return res.status(400).json({ error: 'Type and content are required to file a report.' });
+
+  const newReport = {
+    id: Date.now().toString(),
+    type,
+    content,
+    description,
+    userEmail: userEmail || 'anonymous',
+    status: 'pending_review',
+    createdAt: new Date().toISOString()
+  };
+
+  mockReports.push(newReport);
+  res.status(201).json({ message: 'Report submitted successfully.', reportId: newReport.id });
+});
+
+// 5. Fetch Recent Alerts
+app.get('/api/alerts', async (req, res) => {
+  res.json(mockAlerts);
+});
+
+// 6. Get Dashboard Data
+app.get('/api/dashboard', async (req, res) => {
+  res.json(mockDashboardData);
+});
+
+// 7. Get User Progress
+app.get('/api/user/progress', async (req, res) => {
+  res.json(mockUserProgress);
+});
+
+// 8. Update User Progress
+app.post('/api/user/progress', async (req, res) => {
+  const { moduleId, xpGained } = req.body;
+  if (!moduleId || typeof xpGained !== 'number') return res.status(400).json({ error: 'moduleId and xpGained are required.' });
+
+  mockUserProgress.xp += xpGained;
+  let levelUp = false;
+  if (mockUserProgress.xp >= mockUserProgress.xpToNext) {
+    mockUserProgress.level = 'Expert';
+    mockUserProgress.xpToNext = 1000;
+    levelUp = true;
+  }
+  res.json({ success: true, newXp: mockUserProgress.xp, newLevel: levelUp ? mockUserProgress.level : undefined });
+});
+
+// Fallback for SPA routing (frontend)
+app.get(/^(?!\/api|\/cyber-surakshit-video).*$/, (req, res) => {
+  res.sendFile(path.join(hubDistPath, 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Unified Portal running on http://localhost:${PORT}`);
+});

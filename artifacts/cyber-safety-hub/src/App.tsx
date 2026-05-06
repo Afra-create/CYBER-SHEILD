@@ -16,6 +16,7 @@ import Trainer from "@/pages/trainer";
 import Report from "@/pages/report";
 import Dashboard from "@/pages/dashboard";
 import Signup from "@/pages/signup";
+import Scanner from "@/pages/scanner";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ function Router() {
           <Route path="/report" component={Report} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/signup" component={Signup} />
+          <Route path="/scanner" component={Scanner} />
           <Route component={NotFound} />
         </Switch>
       </motion.div>

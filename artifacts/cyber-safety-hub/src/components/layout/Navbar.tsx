@@ -11,7 +11,8 @@ import {
   Moon, 
   Globe,
   Menu,
-  X
+  X,
+  Search
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/learn", label: "Learn", icon: BookOpen },
     { href: "/trainer", label: "Trainer", icon: Gamepad2 },
+    { href: "/scanner", label: "Scanner", icon: Search },
     { href: "/cyber-surakshit-video/", label: "Videos", icon: Gamepad2, external: true },
     { href: "/report", label: "Report", icon: AlertTriangle },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
