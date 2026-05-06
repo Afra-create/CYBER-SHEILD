@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "wA2nVb0x1RcVWo0y8KLEp"
+uri = "file://artifacts/cyber-surakshit-video/public/neighborhood.png"
+type = "image"
+title = "Minimal Indian neighborhood"

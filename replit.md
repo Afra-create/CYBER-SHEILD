@@ -1,45 +1,67 @@
-# [Project name]
+# Har Ghar Cyber Surakshit
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A cyber safety awareness platform with a full-featured web app for learning, scam training, and reporting — plus a cinematic animated hero background.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/cyber-safety-hub run dev` — run the main website
+- `pnpm --filter @workspace/cyber-surakshit-video run dev` — run the animated video
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL` — Postgres connection string (not yet used)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
+- Website: React + Vite + Tailwind CSS + Framer Motion + Recharts + Wouter
+- Video: React + Vite + Framer Motion (video-js artifact)
+- API: Express 5 (not yet used by frontend — all data is static)
+- DB: PostgreSQL + Drizzle ORM (provisioned, schema empty)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- Website: `artifacts/cyber-safety-hub/src/` — pages in `src/pages/`, components in `src/components/`
+- Video: `artifacts/cyber-surakshit-video/src/components/video/` — scenes in `video_scenes/`
+- API server: `artifacts/api-server/src/`
+- DB schema: `lib/db/src/schema/index.ts`
+- OpenAPI spec: `lib/api-spec/openapi.yaml`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Frontend is fully static/dummy data — no backend integration yet
+- Video uses the video-js artifact pattern with `useVideoPlayer` hook (do not modify `src/lib/video/hooks.ts`)
+- Scene selectors added to video via `VideoWithControls.tsx` wrapper + `useSceneControls.ts` hook
+- Dark mode defaults to ON (appropriate for a cyber security app)
+- Video neighborhood image served from `public/neighborhood.png` using `import.meta.env.BASE_URL`
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **Landing page** (`/`): Hero "Think Before You Click", stats, CTAs
+- **Learning Modules** (`/learn`): Phishing, OTP Scams, Job Fraud, Payment Scams with quizzes
+- **Scam Trainer** (`/trainer`): Interactive fake message identification
+- **Reporting System** (`/report`): Incident submission form
+- **Dashboard** (`/dashboard`): Charts (Recharts), XP, tips
+- **Upgrade to Pro** (`/upgrade`): Free vs Pro tier comparison
+- **Animated Video** (`/cyber-surakshit-video/`): 13.5s cinematic loop with Indian neighborhood, threat icons, blue shield wave, "Har Ghar Cyber Surakshit" reveal
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Theme: dark navy with cyan-blue cyber accents
+- No emojis in UI
+- Frontend-only with static/dummy data
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Do NOT modify `artifacts/cyber-surakshit-video/src/lib/video/hooks.ts` — recording pipeline depends on it
+- Video BASE_URL must be used for all `public/` asset references (e.g. `neighborhood.png`)
+- After each OpenAPI spec change, re-run codegen before using updated types
 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `.local/skills/video-js/SKILL.md` for video animation patterns
