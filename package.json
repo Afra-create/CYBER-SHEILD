@@ -4,6 +4,9 @@
   "license": "MIT",
   "scripts": {
     "dev:local": "pnpm --filter @workspace/cyber-safety-hub build && pnpm --filter @workspace/api-server build && pnpm --filter @workspace/api-server start",
+    "portal:build": "pnpm --filter @workspace/cyber-safety-hub build && pnpm --filter @workspace/cyber-surakshit-video build",
+    "portal:start": "node backend/server.js",
+    "portal": "pnpm run portal:build && pnpm run portal:start",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"

@@ -1,27 +1,25 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// import { initializeApp, cert } from 'firebase-admin/app';
-// import { getFirestore } from 'firebase-admin/firestore';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Initialize OpenAI (Requires OPENAI_API_KEY in .env)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key_to_prevent_crash_if_missing',
 });
-
-// Firebase Admin setup (Commented out until service account is provided)
-// const serviceAccount = require('./serviceAccountKey.json');
-// initializeApp({ credential: cert(serviceAccount) });
-// const db = getFirestore();
 
 // In-memory mock database for fallback
 const mockAlerts = [
@@ -68,64 +66,15 @@ const mockDashboardData = {
   ]
 };
 
-// Serve a placeholder for the video animation to avoid 404 in iframe
-app.get('/cyber-surakshit-video', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <style>
-          body { 
-            margin: 0; 
-            background: black; 
-            color: #0f0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            font-family: monospace;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-          }
-          .glitch { animation: glitch 1s infinite; }
-          @keyframes glitch {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="glitch">Cyber Shield Animation Loading...</div>
-      </body>
-    </html>
-  `);
-});
+// Serve static files for cyber-safety-hub (frontend)
+const hubDistPath = path.resolve(__dirname, '../artifacts/cyber-safety-hub/dist/public');
+app.use(express.static(hubDistPath));
 
-app.get('/cyber-surakshit-video/', (req, res) => {
-  res.redirect('/cyber-surakshit-video');
-});
+// Serve static files for cyber-surakshit-video
+const videoDistPath = path.resolve(__dirname, '../artifacts/cyber-surakshit-video/dist/public');
+app.use('/cyber-surakshit-video', express.static(videoDistPath));
 
 // --- API ROUTES ---
-
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    name: 'CyberSafe Hub API',
-    status: 'running',
-    version: '1.0.0',
-    endpoints: {
-      health:  'GET  /api/health',
-      scan:    'POST /api/scan',
-      chat:    'POST /api/chat',
-      report:  'POST /api/reports',
-      alerts:  'GET  /api/alerts',
-      dashboard: 'GET  /api/dashboard',
-      userProgress: 'GET  /api/user/progress',
-      updateProgress: 'POST /api/user/progress',
-    }
-  });
-});
 
 // 1. Health Check
 app.get('/api/health', (req, res) => {
@@ -133,13 +82,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // 2. Scam Message Scanner
-// Analyzes a message or URL for phishing/scam patterns
 app.post('/api/scan', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'Text or URL is required for scanning.' });
 
   try {
-    // If we have a real OpenAI key, use it. Otherwise, return mock response.
     if (process.env.OPENAI_API_KEY) {
       const response = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
@@ -152,7 +99,6 @@ app.post('/api/scan', async (req, res) => {
       const result = JSON.parse(response.choices[0].message.content);
       return res.json(result);
     } else {
-      // Mock analysis logic
       const isScam = text.toLowerCase().includes('urgent') || text.toLowerCase().includes('win') || text.toLowerCase().includes('http');
       res.json({
         isScam,
@@ -179,15 +125,12 @@ app.post('/api/chat', async (req, res) => {
         ...history,
         { role: 'user', content: message }
       ];
-      
       const response = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages
       });
-      
       res.json({ reply: response.choices[0].message.content });
     } else {
-      // Mock response
       res.json({ reply: `(Mock Mode) I understand you asked: "${message}". As an AI, I suggest verifying the sender's identity before clicking any links.`, source: 'Mock Chatbot' });
     }
   } catch (error) {
@@ -199,10 +142,7 @@ app.post('/api/chat', async (req, res) => {
 // 4. Submit Scam Report
 app.post('/api/reports', async (req, res) => {
   const { type, content, description, userEmail } = req.body;
-  
-  if (!content || !type) {
-    return res.status(400).json({ error: 'Type and content are required to file a report.' });
-  }
+  if (!content || !type) return res.status(400).json({ error: 'Type and content are required to file a report.' });
 
   const newReport = {
     id: Date.now().toString(),
@@ -214,84 +154,45 @@ app.post('/api/reports', async (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  try {
-    // If Firebase Admin is configured, use it:
-    // await db.collection('reports').doc(newReport.id).set(newReport);
-    
-    // Fallback:
-    mockReports.push(newReport);
-    res.status(201).json({ message: 'Report submitted successfully.', reportId: newReport.id });
-  } catch (error) {
-    console.error('Reporting Error:', error);
-    res.status(500).json({ error: 'Failed to submit report.' });
-  }
+  mockReports.push(newReport);
+  res.status(201).json({ message: 'Report submitted successfully.', reportId: newReport.id });
 });
 
 // 5. Fetch Recent Alerts
 app.get('/api/alerts', async (req, res) => {
-  try {
-    // If Firebase Admin is configured:
-    // const snapshot = await db.collection('alerts').orderBy('date', 'desc').limit(5).get();
-    // const alerts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    // return res.json(alerts);
-    
-    res.json(mockAlerts);
-  } catch (error) {
-    console.error('Alerts Error:', error);
-    res.status(500).json({ error: 'Failed to fetch alerts.' });
-  }
+  res.json(mockAlerts);
 });
 
 // 6. Get Dashboard Data
 app.get('/api/dashboard', async (req, res) => {
-  try {
-    res.json(mockDashboardData);
-  } catch (error) {
-    console.error('Dashboard Error:', error);
-    res.status(500).json({ error: 'Failed to fetch dashboard data.' });
-  }
+  res.json(mockDashboardData);
 });
 
 // 7. Get User Progress
 app.get('/api/user/progress', async (req, res) => {
-  try {
-    res.json(mockUserProgress);
-  } catch (error) {
-    console.error('User Progress Error:', error);
-    res.status(500).json({ error: 'Failed to fetch user progress.' });
-  }
+  res.json(mockUserProgress);
 });
 
 // 8. Update User Progress
 app.post('/api/user/progress', async (req, res) => {
   const { moduleId, xpGained } = req.body;
-  
-  if (!moduleId || typeof xpGained !== 'number') {
-    return res.status(400).json({ error: 'moduleId and xpGained are required.' });
-  }
+  if (!moduleId || typeof xpGained !== 'number') return res.status(400).json({ error: 'moduleId and xpGained are required.' });
 
-  try {
-    mockUserProgress.xp += xpGained;
-    
-    // Check for level up
-    let levelUp = false;
-    if (mockUserProgress.xp >= mockUserProgress.xpToNext) {
-      mockUserProgress.level = 'Expert';
-      mockUserProgress.xpToNext = 1000;
-      levelUp = true;
-    }
-    
-    res.json({ 
-      success: true, 
-      newXp: mockUserProgress.xp, 
-      newLevel: levelUp ? mockUserProgress.level : undefined 
-    });
-  } catch (error) {
-    console.error('Progress Update Error:', error);
-    res.status(500).json({ error: 'Failed to update progress.' });
+  mockUserProgress.xp += xpGained;
+  let levelUp = false;
+  if (mockUserProgress.xp >= mockUserProgress.xpToNext) {
+    mockUserProgress.level = 'Expert';
+    mockUserProgress.xpToNext = 1000;
+    levelUp = true;
   }
+  res.json({ success: true, newXp: mockUserProgress.xp, newLevel: levelUp ? mockUserProgress.level : undefined });
+});
+
+// Fallback for SPA routing (frontend)
+app.get(/^(?!\/api|\/cyber-surakshit-video).*$/, (req, res) => {
+  res.sendFile(path.join(hubDistPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Unified Portal running on http://localhost:${PORT}`);
 });

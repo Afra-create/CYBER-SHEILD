@@ -36,7 +36,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/learn", label: "Learn", icon: BookOpen },
     { href: "/trainer", label: "Trainer", icon: Gamepad2 },
-    { href: "/cyber-surakshit-video", label: "Videos", icon: Gamepad2, external: true },
+    { href: "/cyber-surakshit-video/", label: "Videos", icon: Gamepad2, external: true },
     { href: "/report", label: "Report", icon: AlertTriangle },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   ];
