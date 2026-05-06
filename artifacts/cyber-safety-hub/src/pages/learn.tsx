@@ -286,6 +286,7 @@ const MODULES = [
     progress: 100,
     color: "bg-blue-500",
     completed: true,
+    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
   },
   {
     id: "otp",
@@ -296,6 +297,7 @@ const MODULES = [
     progress: 40,
     color: "bg-orange-500",
     completed: false,
+    videoUrl: "https://www.w3schools.com/html/movie.mp4",
   },
   {
     id: "job",
@@ -306,6 +308,7 @@ const MODULES = [
     progress: 0,
     color: "bg-purple-500",
     completed: false,
+    videoUrl: "https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4",
   },
   {
     id: "social",
@@ -316,6 +319,7 @@ const MODULES = [
     progress: 0,
     color: "bg-rose-500",
     completed: false,
+    videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   }
 ];
 
@@ -626,6 +630,31 @@ export default function Learn() {
                     <div className="p-10 md:p-14">
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         <div className="lg:col-span-2 space-y-12">
+                          {/* Video Section Placeholder */}
+                          <section>
+                            <h3 className="text-2xl font-black mb-6 flex items-center gap-3 tracking-tight">
+                              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                <Play className="w-5 h-5 text-primary" />
+                              </div>
+                              Interactive Lesson
+                            </h3>
+                            <div className="w-full rounded-2xl overflow-hidden border border-border/50 bg-black shadow-xl group relative">
+                              <video 
+                                key={activeModule?.id}
+                                controls 
+                                className="w-full h-auto max-h-[60vh] object-contain"
+                                poster="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000"
+                              >
+                                {/* The videoUrl is pulled from the MODULES array at the top of the file */}
+                                <source src={activeModule?.videoUrl} type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                            <p className="mt-4 text-sm text-muted-foreground italic border-l-2 border-primary/50 pl-3">
+                              * Dummy video placeholder. Update the video source with your custom interactive lesson later.
+                            </p>
+                          </section>
+
                           <section>
                             <h3 className="text-2xl font-black mb-6 flex items-center gap-3 tracking-tight">
                               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -683,9 +712,18 @@ export default function Learn() {
                               <CardTitle className="text-lg font-black tracking-tight uppercase">Module Actions</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 pt-6">
-                              <Button className="w-full gap-3 h-14 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20">
+                              <Button 
+                                className="w-full gap-3 h-14 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20"
+                                onClick={() => {
+                                  const video = document.querySelector('video');
+                                  if (video) {
+                                    video.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    video.play().catch(() => {});
+                                  }
+                                }}
+                              >
                                 <Play className="w-6 h-6 fill-current" />
-                                Interactive Lesson
+                                Play Lesson Video
                               </Button>
                               <Button 
                                 variant="outline" 

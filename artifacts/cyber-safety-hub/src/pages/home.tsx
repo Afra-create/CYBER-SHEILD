@@ -86,13 +86,12 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <iframe
-            src="/cyber-surakshit-video/"
-            title="Cyber Shield Animation"
-            className="w-full h-full border-0"
-            style={{ display: "block" }}
-            tabIndex={-1}
-            aria-hidden="true"
+          {/* Replaced iframe with a static image placeholder to prevent infinite loops locally. 
+              To use the real animation, run cyber-surakshit-video on another port and embed it here. */}
+          <img 
+            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80" 
+            alt="Cyber Background" 
+            className="w-full h-full object-cover opacity-30" 
           />
         </motion.div>
 
