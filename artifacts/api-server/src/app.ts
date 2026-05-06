@@ -36,17 +36,4 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
-// Serve static files for cyber-safety-hub (frontend)
-const frontendPath = path.resolve(__dirname, "../../cyber-safety-hub/dist/public");
-app.use("/", express.static(frontendPath));
-
-// Serve static files for cyber-surakshit-video
-const videoPath = path.resolve(__dirname, "../../cyber-surakshit-video/dist/public");
-app.use("/cyber-surakshit-video", express.static(videoPath));
-
-// Fallback for SPA routing (frontend)
-app.get(/^(?!\/api|\/cyber-surakshit-video).*$/, (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
-
 export default app;
