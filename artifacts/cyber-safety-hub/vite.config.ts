@@ -51,7 +51,7 @@ export default defineConfig({
     host: "0.0.0.0",
     proxy: {
       "/cyber-surakshit-video": {
-        target: "http://localhost:5000",
+        target: "http://localhost:3002",
         changeOrigin: true,
       },
       "/api": {

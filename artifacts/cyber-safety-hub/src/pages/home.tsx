@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import CyberMatrixHero from "@/components/ui/cyber-matrix-hero";
 import { Button } from "@/components/ui/button";
+import { CyberShieldAnimation } from "@/components/animation/CyberShieldAnimation";
 
 /* ─── data ─────────────────────────────────────────────────── */
 const STATS = [
@@ -69,19 +70,14 @@ export default function Home() {
 
         {/* 1 ▸ VIDEO — fades in immediately from black */}
         <motion.div
-          className="absolute inset-0 z-0 pointer-events-none bg-black"
+          className="absolute inset-0 z-0 bg-black"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <iframe
-            src="/cyber-surakshit-video/"
-            title="Cyber Shield Animation"
-            className="w-full h-full border-0"
-            style={{ display: "block" }}
-            tabIndex={-1}
-            aria-hidden="true"
-          />
+          <div className="w-full h-full">
+            <CyberShieldAnimation />
+          </div>
         </motion.div>
 
         {/* 2 ▸ GRADIENT VIGNETTE — appears with video */}

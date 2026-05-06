@@ -60,6 +60,7 @@ function fixPackageJson(filePath) {
 const files = [
   'package.json',
   'artifacts/cyber-safety-hub/package.json',
+  'artifacts/cyber-surakshit-video/package.json',
   'lib/api-client-react/package.json'
 ];
 
