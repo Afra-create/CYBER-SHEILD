@@ -36,6 +36,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/learn", label: "Learn", icon: BookOpen },
     { href: "/trainer", label: "Trainer", icon: Gamepad2 },
+    { href: "/cyber-surakshit-video", label: "Videos", icon: Gamepad2, external: true },
     { href: "/report", label: "Report", icon: AlertTriangle },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   ];
@@ -57,16 +58,25 @@ export function Navbar() {
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = location === link.href;
-              return (
+              
+              const buttonContent = (
+                <Button 
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={`gap-2 ${isActive ? 'bg-secondary font-semibold' : 'text-muted-foreground'}`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {link.label}
+                </Button>
+              );
+
+              return link.external ? (
+                <a key={link.href} href={link.href}>
+                  {buttonContent}
+                </a>
+              ) : (
                 <Link key={link.href} href={link.href}>
-                  <Button 
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    className={`gap-2 ${isActive ? 'bg-secondary font-semibold' : 'text-muted-foreground'}`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {link.label}
-                  </Button>
+                  {buttonContent}
                 </Link>
               );
             })}
@@ -135,15 +145,24 @@ export function Navbar() {
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const isActive = location === link.href;
-                  return (
+                  
+                  const buttonContent = (
+                    <Button 
+                      variant={isActive ? "secondary" : "ghost"}
+                      className="w-full justify-start gap-3"
+                    >
+                      <Icon className="w-5 h-5" />
+                      {link.label}
+                    </Button>
+                  );
+
+                  return link.external ? (
+                    <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
+                      {buttonContent}
+                    </a>
+                  ) : (
                     <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
-                      <Button 
-                        variant={isActive ? "secondary" : "ghost"}
-                        className="w-full justify-start gap-3"
-                      >
-                        <Icon className="w-5 h-5" />
-                        {link.label}
-                      </Button>
+                      {buttonContent}
                     </Link>
                   );
                 })}

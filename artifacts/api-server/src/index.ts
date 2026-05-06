@@ -15,6 +15,26 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+import path from "path";
+import { fileURLToPath } from "url";
+import express from "express";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files for cyber-safety-hub (frontend)
+const frontendPath = path.resolve(__dirname, "../../cyber-safety-hub/dist/public");
+app.use(express.static(frontendPath));
+
+// Serve static files for cyber-surakshit-video
+const videoPath = path.resolve(__dirname, "../../cyber-surakshit-video/dist/public");
+app.use("/cyber-surakshit-video", express.static(videoPath));
+
+// Fallback for SPA routing (frontend)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
 app.listen(port, (err) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
