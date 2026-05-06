@@ -1,0 +1,33 @@
+/* SplashScreen.css */
+
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: #00000c; /* matches logo.mp4 background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+.splash-fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-video {
+  width: min(60vw, 60vh);
+  height: min(60vw, 60vh);
+  object-fit: contain;
+  /* No border, no shadow — pure clean logo on black */
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .splash-video {
+    width: 80vw;
+    height: 80vw;
+  }
+}
