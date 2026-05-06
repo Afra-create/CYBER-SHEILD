@@ -11,6 +11,7 @@ import Home from "@/pages/home";
 import Learn from "@/pages/learn";
 import Trainer from "@/pages/trainer";
 import Report from "@/pages/report";
+import Scanner from "@/pages/scanner";
 import Dashboard from "@/pages/dashboard";
 import Signup from "@/pages/signup";
 import NotFound from "@/pages/not-found";
@@ -27,6 +28,7 @@ function Router() {
         <Route path="/learn" component={Learn} />
         <Route path="/trainer" component={Trainer} />
         <Route path="/report" component={Report} />
+        <Route path="/scanner" component={Scanner} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/signup" component={Signup} />
         <Route component={NotFound} />

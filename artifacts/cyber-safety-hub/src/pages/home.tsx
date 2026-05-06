@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   Shield, AlertTriangle, BookOpen, ChevronRight,
-  CheckCircle2, Lock, Users, Zap, ArrowRight,
+  CheckCircle2, Lock, Users, Zap, ArrowRight, Search
 } from "lucide-react";
 import CyberMatrixHero from "@/components/ui/cyber-matrix-hero";
 import { Button } from "@/components/ui/button";
@@ -24,16 +24,16 @@ const FEATURES = [
     href: "/learn", cta: "Explore Modules",
   },
   {
+    icon: Search, title: "AI Scam Scanner",
+    desc: "Upload a screenshot of any message and let our AI detect potential scams instantly.",
+    points: ["Instant pattern recognition", "URL & sender analysis", "Actionable safety advice"],
+    href: "/scanner", cta: "Scan Screenshot",
+  },
+  {
     icon: Shield, title: "Live Scam Trainer",
     desc: "Test your instincts against simulated scam messages, emails & calls in a safe environment.",
     points: ["Simulated WhatsApp/SMS scams", "Instant feedback & explanations", "Progress tracking & badges"],
     href: "/trainer", cta: "Try the Trainer",
-  },
-  {
-    icon: Zap, title: "Threat Dashboard",
-    desc: "Track emerging scam trends in your region and stay one step ahead with live community data.",
-    points: ["Real-time scam trend charts", "XP & achievement system", "Personalised safety tips"],
-    href: "/dashboard", cta: "Open Dashboard",
   },
 ];
 
