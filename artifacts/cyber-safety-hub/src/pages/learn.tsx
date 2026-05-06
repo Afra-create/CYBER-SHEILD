@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, ShieldAlert, CreditCard, Briefcase, ChevronRight, Play, CheckCircle2, AlertTriangle, ArrowLeft, Trophy, RefreshCcw, HelpCircle } from "lucide-react";
+import { BookOpen, ShieldAlert, CreditCard, Briefcase, ChevronRight, Play, CheckCircle2, AlertTriangle, ArrowLeft, Trophy, RefreshCcw, HelpCircle, Pause, MousePointer2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,28 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+
+/* ─── data ─────────────────────────────────────────────────── */
+const INTERACTIVE_MOMENTS: Record<string, { time: number; question: string; options: string[]; correctAnswer: number; explanation: string }[]> = {
+  phishing: [
+    {
+      time: 5,
+      question: "The video just showed a suspicious URL. Did you notice the domain extension?",
+      options: [".com (Official)", ".info (Suspicious)", ".gov (Government)"],
+      correctAnswer: 1,
+      explanation: "Scammers often use generic extensions like .info or .biz to mimic real sites."
+    }
+  ],
+  otp: [
+    {
+      time: 3,
+      question: "The 'bank caller' is asking for an OTP. What is the rule?",
+      options: ["Share it only for verification", "Never share OTP with anyone", "Share only if they know your name"],
+      correctAnswer: 1,
+      explanation: "Banks NEVER ask for OTP over the phone. Anyone asking for it is a scammer."
+    }
+  ]
+};
 
 const QUIZ_DATA: Record<string, {
   questions: {
@@ -332,8 +354,63 @@ export default function Learn() {
   const [quizFinished, setQuizFinished] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
+  // Video Interactivity State
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeMoment, setActiveMoment] = useState<number | null>(null);
+  const [momentAnswered, setMomentAnswered] = useState(false);
+  const [momentSelectedAnswer, setMomentSelectedAnswer] = useState<number | null>(null);
+  const [showMomentExplanation, setShowMomentExplanation] = useState(false);
+
   const activeModule = MODULES.find(m => m.id === selectedModule);
   const quiz = selectedModule ? QUIZ_DATA[selectedModule] : null;
+  const moments = selectedModule ? INTERACTIVE_MOMENTS[selectedModule] || [] : [];
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !selectedModule) return;
+
+    const handleTimeUpdate = () => {
+      const currentTime = Math.floor(video.currentTime);
+      const momentIndex = moments.findIndex(m => m.time === currentTime);
+      
+      if (momentIndex !== -1 && activeMoment !== momentIndex && !momentAnswered) {
+        video.pause();
+        setIsPlaying(false);
+        setActiveMoment(momentIndex);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [selectedModule, activeMoment, momentAnswered, moments]);
+
+  const handleMomentAnswer = (idx: number) => {
+    setMomentSelectedAnswer(idx);
+    setShowMomentExplanation(true);
+  };
+
+  const resumeVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setIsPlaying(true);
+      setActiveMoment(null);
+      setMomentAnswered(true);
+      setMomentSelectedAnswer(null);
+      setShowMomentExplanation(false);
+    }
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   const handleNextQuestion = () => {
     if (!quiz) return;
@@ -373,6 +450,9 @@ export default function Learn() {
     setSelectedModule(null);
     setShowQuiz(false);
     resetQuiz();
+    setIsPlaying(false);
+    setActiveMoment(null);
+    setMomentAnswered(false);
   };
 
   return (
@@ -630,7 +710,7 @@ export default function Learn() {
                     <div className="p-10 md:p-14">
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         <div className="lg:col-span-2 space-y-12">
-                          {/* Video Section Placeholder */}
+                          {/* Video Section with Interactivity */}
                           <section>
                             <h3 className="text-2xl font-black mb-6 flex items-center gap-3 tracking-tight">
                               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -640,18 +720,97 @@ export default function Learn() {
                             </h3>
                             <div className="w-full rounded-2xl overflow-hidden border border-border/50 bg-black shadow-xl group relative">
                               <video 
+                                ref={videoRef}
                                 key={activeModule?.id}
-                                controls 
                                 className="w-full h-auto max-h-[60vh] object-contain"
                                 poster="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000"
+                                onPlay={() => setIsPlaying(true)}
+                                onPause={() => setIsPlaying(false)}
                               >
-                                {/* The videoUrl is pulled from the MODULES array at the top of the file */}
                                 <source src={activeModule?.videoUrl} type="video/mp4" />
                                 Your browser does not support the video tag.
                               </video>
+
+                              {/* Playback Overlay */}
+                              <div 
+                                className={`absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity duration-300 cursor-pointer ${isPlaying ? 'opacity-0' : 'opacity-100'}`}
+                                onClick={togglePlay}
+                              >
+                                <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center shadow-2xl scale-110 group-hover:scale-125 transition-transform">
+                                  {isPlaying ? <Pause className="w-10 h-10 text-white fill-current" /> : <Play className="w-10 h-10 text-white fill-current ml-1" />}
+                                </div>
+                              </div>
+
+                              {/* Interactive Moment Overlay */}
+                              <AnimatePresence>
+                                {activeMoment !== null && (
+                                  <motion.div 
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                                  >
+                                    <Card className="max-w-md w-full border-primary/50 bg-card/90 shadow-2xl rounded-3xl overflow-hidden">
+                                      <CardHeader className="bg-primary/10 border-b border-primary/20 pb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <Badge className="bg-primary text-white text-[10px] font-black uppercase tracking-widest">Interactive Moment</Badge>
+                                          <MousePointer2 className="w-3 h-3 text-primary animate-bounce" />
+                                        </div>
+                                        <CardTitle className="text-xl font-black tracking-tight">
+                                          {moments[activeMoment].question}
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="pt-6 space-y-3">
+                                        {moments[activeMoment].options.map((option, idx) => (
+                                          <Button
+                                            key={idx}
+                                            variant="outline"
+                                            disabled={showMomentExplanation}
+                                            className={`w-full justify-start h-auto py-4 px-6 text-left rounded-xl transition-all ${
+                                              momentSelectedAnswer === idx 
+                                                ? (idx === moments[activeMoment].correctAnswer ? 'border-green-500 bg-green-500/10' : 'border-destructive bg-destructive/10')
+                                                : 'hover:border-primary/50'
+                                            }`}
+                                            onClick={() => handleMomentAnswer(idx)}
+                                          >
+                                            <span className="font-bold">{option}</span>
+                                          </Button>
+                                        ))}
+
+                                        {showMomentExplanation && (
+                                          <motion.div 
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            className={`p-4 rounded-xl text-sm leading-relaxed ${
+                                              momentSelectedAnswer === moments[activeMoment].correctAnswer
+                                                ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                                                : 'bg-destructive/10 text-destructive border border-destructive/30'
+                                            }`}
+                                          >
+                                            <p className="font-bold mb-1">
+                                              {momentSelectedAnswer === moments[activeMoment].correctAnswer ? 'Correct!' : 'Incorrect'}
+                                            </p>
+                                            {moments[activeMoment].explanation}
+                                          </motion.div>
+                                        )}
+                                      </CardContent>
+                                      <CardFooter className="bg-white/5 pt-4">
+                                        <Button 
+                                          className="w-full h-12 rounded-xl font-bold shadow-lg shadow-primary/20"
+                                          disabled={!showMomentExplanation}
+                                          onClick={resumeVideo}
+                                        >
+                                          Resume Lesson
+                                          <ChevronRight className="w-4 h-4 ml-2" />
+                                        </Button>
+                                      </CardFooter>
+                                    </Card>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
                             </div>
                             <p className="mt-4 text-sm text-muted-foreground italic border-l-2 border-primary/50 pl-3">
-                              * Dummy video placeholder. Update the video source with your custom interactive lesson later.
+                              * The video will automatically pause at key moments for your input. Look out for the interactive overlays!
                             </p>
                           </section>
 
@@ -714,16 +873,19 @@ export default function Learn() {
                             <CardContent className="space-y-4 pt-6">
                               <Button 
                                 className="w-full gap-3 h-14 text-lg font-bold rounded-2xl shadow-xl shadow-primary/20"
-                                onClick={() => {
-                                  const video = document.querySelector('video');
-                                  if (video) {
-                                    video.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    video.play().catch(() => {});
-                                  }
-                                }}
+                                onClick={togglePlay}
                               >
-                                <Play className="w-6 h-6 fill-current" />
-                                Play Lesson Video
+                                {isPlaying ? (
+                                  <>
+                                    <Pause className="w-6 h-6 fill-current" />
+                                    Pause Lesson Video
+                                  </>
+                                ) : (
+                                  <>
+                                    <Play className="w-6 h-6 fill-current" />
+                                    Play Lesson Video
+                                  </>
+                                )}
                               </Button>
                               <Button 
                                 variant="outline" 
