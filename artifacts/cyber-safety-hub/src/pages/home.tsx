@@ -86,12 +86,13 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          {/* Replaced iframe with a static image placeholder to prevent infinite loops locally. 
-              To use the real animation, run cyber-surakshit-video on another port and embed it here. */}
-          <img 
-            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80" 
-            alt="Cyber Background" 
-            className="w-full h-full object-cover opacity-30" 
+          <iframe
+            src="/video/"
+            title="Cyber Shield Animation"
+            className="w-full h-full border-0 pointer-events-none"
+            style={{ display: "block" }}
+            tabIndex={-1}
+            aria-hidden="true"
           />
         </motion.div>
 
@@ -104,11 +105,11 @@ export default function Home() {
           style={{
             background:
               "linear-gradient(to bottom," +
-              "rgba(0,0,0,0.78) 0%," +
-              "rgba(0,0,0,0.12) 30%," +
-              "rgba(0,0,0,0.05) 55%," +
-              "rgba(0,0,0,0.70) 82%," +
-              "rgba(0,0,0,0.92) 100%)",
+              "rgba(0,0,0,0.5) 0%," +
+              "rgba(0,0,0,0.05) 30%," +
+              "rgba(0,0,0,0.0) 55%," +
+              "rgba(0,0,0,0.4) 82%," +
+              "rgba(0,0,0,0.8) 100%)",
           }}
         />
 
@@ -155,7 +156,7 @@ export default function Home() {
 
         {/* ── BOTTOM CONTENT — 0.2s delay ── */}
         <motion.div
-          className="relative z-20 flex flex-col items-center gap-5 pb-10 px-6"
+          className="relative z-20 flex flex-col items-center pb-12 px-6"
           initial="hidden"
           animate="show"
           variants={{
@@ -163,34 +164,33 @@ export default function Home() {
             show: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } },
           }}
         >
-          {/* Sub-headline */}
-          <motion.p
-            variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.3, ease } } }}
-            className="text-base md:text-lg text-white/65 max-w-md text-center leading-relaxed"
-          >
-            Empowering Indian families to recognize, resist, and report digital threats.
-          </motion.p>
+          {/* Glass panel to prevent text overlap with the video */}
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl max-w-3xl w-full text-center shadow-2xl flex flex-col items-center gap-6">
+            <motion.p
+              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.3, ease } } }}
+              className="text-base md:text-lg text-white/90 font-medium tracking-wide max-w-2xl text-center leading-relaxed"
+            >
+              Empowering Indian families to recognize, resist, and report digital threats.
+            </motion.p>
 
-          {/* CTA pill */}
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 16, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease } } }}
-            className="flex flex-col sm:flex-row items-center gap-2.5 p-2 rounded-2xl"
-            style={{ background: "rgba(0,0,0,0.52)", backdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.09)" }}
-          >
-            <Link href="/signup">
-              <Button size="lg" className="h-11 px-7 text-sm font-bold rounded-xl shadow-lg shadow-primary/20 group">
-                Start Learning
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </Link>
-            <Link href="/report">
-              <Button size="lg" variant="ghost" className="h-11 px-7 text-sm font-bold rounded-xl text-white/70 hover:text-white hover:bg-white/10">
-                Report a Scam
-                <AlertTriangle className="ml-2 w-4 h-4 text-destructive" />
-              </Button>
-            </Link>
-          </motion.div>
-
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 16, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease } } }}
+              className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center"
+            >
+              <Link href="/learn">
+                <Button size="lg" className="h-12 px-8 text-sm font-bold rounded-xl shadow-lg shadow-primary/20 group w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
+                  Interactive Modules
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/trainer">
+                <Button size="lg" variant="outline" className="h-12 px-8 text-sm font-bold rounded-xl text-white hover:text-white hover:bg-white/10 border-white/20 w-full sm:w-auto bg-white/5 backdrop-blur-md">
+                  <Shield className="mr-2 w-4 h-4" />
+                  Live Scam Trainer
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
           {/* Live stat chips */}
           <motion.div
             variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.3, ease } } }}
