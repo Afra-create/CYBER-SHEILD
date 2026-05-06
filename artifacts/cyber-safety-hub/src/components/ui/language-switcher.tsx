@@ -38,6 +38,13 @@ export function LanguageSwitcher() {
           <span>{t('nav.lang_hi')}</span>
           {i18n.language === 'hi' && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
         </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => changeLanguage("kn")}
+          className={`rounded-lg cursor-pointer hover:bg-white/10 focus:bg-white/10 transition-colors py-2 px-3 flex items-center justify-between ${i18n.language === 'kn' ? 'bg-white/5 text-primary' : ''}`}
+        >
+          <span>{t('nav.lang_kn')}</span>
+          {i18n.language === 'kn' && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
