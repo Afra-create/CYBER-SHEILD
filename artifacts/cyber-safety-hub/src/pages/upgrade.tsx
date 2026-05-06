@@ -14,7 +14,7 @@ export default function Upgrade() {
       <div className="bg-secondary/30 py-16 border-b border-border">
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <Badge className="bg-primary/20 text-primary border-none px-3 py-1 mb-6 text-sm">
-            Har Ghar Cyber Surakshit PRO
+            Cyber Shield PRO
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6">Take Your Family's Digital Security to the Next Level</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -159,7 +159,7 @@ export default function Upgrade() {
             </div>
             <DialogTitle className="text-2xl text-center">Upgrade to Pro</DialogTitle>
             <DialogDescription className="text-center text-base">
-              You're about to unlock the full potential of Har Ghar Cyber Surakshit.
+              You're about to unlock the full potential of Cyber Shield.
             </DialogDescription>
           </DialogHeader>
           <div className="bg-secondary/50 rounded-xl p-6 my-4 border border-border">

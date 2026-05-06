@@ -23,30 +23,40 @@ export default function Home() {
           />
         </div>
 
-        {/* Dark gradient overlay — strong only at top (navbar) and bottom (text area) */}
-        <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/70 via-transparent to-black/90" />
+        {/* Overlay: dark at top & bottom, fully clear in the middle */}
+        <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-black/75 via-transparent via-40% to-black/85" />
 
-        {/* Hero content — pinned to bottom so animation fills the visible area */}
-        <div className="relative z-20 w-full mt-auto container mx-auto px-4 pb-16 md:pb-20 text-center">
+        {/* TOP — title pinned just below the navbar */}
+        <div className="relative z-20 w-full pt-24 md:pt-28 text-center px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary font-medium text-sm mb-6 border border-primary/30 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary font-medium text-sm mb-5 border border-primary/30 backdrop-blur-sm">
               <Shield className="w-4 h-4" />
               <span>National Cyber Awareness Initiative</span>
             </div>
-
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-2xl">
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight drop-shadow-2xl">
               <span className="text-white">Think Before You </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Click</span>
             </h1>
+          </motion.div>
+        </div>
 
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow">
+        {/* MIDDLE — spacer so animation shows through */}
+        <div className="flex-1" />
+
+        {/* BOTTOM — description + CTAs */}
+        <div className="relative z-20 w-full pb-16 md:pb-20 text-center px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow">
               Empowering Indian families to recognize, resist, and report digital threats. Join thousands of citizens making the internet a safer place for everyone.
             </p>
-
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/learn">
                 <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 shadow-lg shadow-primary/25 group">
