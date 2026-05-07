@@ -16,7 +16,7 @@
     "feat1_p2": "Understand scammer psychology",
     "feat1_p3": "Secure your digital identity",
     "feat1_cta": "Explore Modules",
-    "feat2_title": "Live Scam Trainer",
+    "feat2_title": "Learning Game",
     "feat2_desc": "Test your instincts against simulated scam messages, emails & calls in a safe environment.",
     "feat2_p1": "Simulated WhatsApp/SMS scams",
     "feat2_p2": "Instant feedback & explanations",
@@ -64,7 +64,7 @@
   "nav": {
     "home": "Home",
     "learn": "Learn",
-    "trainer": "Trainer",
+    "trainer": "Learning Game",
     "scanner": "Scanner",
     "dashboard": "Dashboard",
     "report": "Report",
