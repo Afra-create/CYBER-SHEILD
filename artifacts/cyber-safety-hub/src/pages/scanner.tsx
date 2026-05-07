@@ -27,6 +27,7 @@ interface ScanResult {
   threatLevel: string;
   category: string;
   summary: string;
+  redFlags: string[];
   recommendations: string[];
 }
 
@@ -226,6 +227,23 @@ export default function Scanner() {
                         <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground">AI Analysis Summary</h4>
                         <p className="text-lg leading-relaxed font-medium">{result.summary}</p>
                       </div>
+
+                      {result.redFlags && result.redFlags.length > 0 && (
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-black uppercase tracking-widest text-destructive/80 flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4" />
+                            Red Flags Identified
+                          </h4>
+                          <div className="grid grid-cols-1 gap-2">
+                            {result.redFlags.map((flag, i) => (
+                              <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive-foreground">
+                                <span className="font-bold text-destructive">•</span>
+                                <span className="text-sm font-medium">{flag}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="space-y-4">
                         <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Recommended Actions</h4>

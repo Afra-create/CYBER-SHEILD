@@ -93,6 +93,7 @@ class ApiClient {
       threatLevel: string;
       category: string;
       summary: string;
+      redFlags: string[];
       recommendations: string[];
       source?: string;
     }>('/api/scan-screenshot', {
