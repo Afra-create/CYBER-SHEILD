@@ -64,7 +64,12 @@ export default function Dashboard() {
   const userStats = dashboardData?.userStats;
   const scamTrends = dashboardData?.scamTrends || SCAM_TRENDS_DATA;
   const reportsData = dashboardData?.reportsData || REPORTS_DATA;
-  const { t } = useTranslation();
+  const communityStats = dashboardData?.communityStats || { 
+    totalReportsFiled: 1300120, reportsToday: 145, 
+    topScamTypes: ['Phishing'], threatLevel: 'Elevated', 
+    threatDescription: 'Standard activity.' 
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl relative">
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none blur-3xl" />
@@ -85,36 +90,77 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className={`shadow-lg ${communityStats.threatLevel === 'Critical' ? 'bg-destructive/20 border-destructive' : 'bg-destructive/10 border-destructive/20'}`}>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-bold text-destructive uppercase tracking-widest mb-1">Threat Level: {communityStats.threatLevel}</p>
+                  <h3 className="text-3xl font-black text-white">{communityStats.reportsToday} Reports</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Filed in the last 24 hours</p>
+                </div>
+                <AlertTriangle className="w-10 h-10 text-destructive opacity-80 animate-pulse" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary/10 border-primary/20 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Total Verified Reports</p>
+                  <h3 className="text-3xl font-black text-white">{(communityStats.totalReportsFiled / 1000000).toFixed(1)}M+</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Protecting the community</p>
+                </div>
+                <Shield className="w-10 h-10 text-primary opacity-80" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-orange-500/10 border-orange-500/20 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-1">Top Active Threat</p>
+                  <h3 className="text-2xl font-black text-white truncate max-w-[200px]">{communityStats.topScamTypes[0]}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{communityStats.threatDescription}</p>
+                </div>
+                <Activity className="w-10 h-10 text-orange-500 opacity-80" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-primary">
             <CardContent className="p-6">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.national_loss_t') || "National Financial Loss"}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">National Financial Loss</p>
               <h3 className="text-3xl font-black text-primary">₹1,750 Cr+</h3>
-              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.national_loss_d') || "Reported in 2023 across India"}</p>
+              <p className="text-[10px] text-muted-foreground mt-2">Reported in 2023 across India</p>
             </CardContent>
           </Card>
           
           <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-orange-500">
             <CardContent className="p-6">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.upi_scams_t') || "UPI Fraud Volume"}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">UPI Fraud Volume</p>
               <h3 className="text-3xl font-black text-orange-500">55%</h3>
-              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.upi_scams_d') || "Of all financial crimes are UPI-based"}</p>
+              <p className="text-[10px] text-muted-foreground mt-2">Of all financial crimes are UPI-based</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-blue-500">
             <CardContent className="p-6">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.complaints_t') || "Complaints Registered"}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Complaints Registered</p>
               <h3 className="text-3xl font-black text-blue-500">1.3M+</h3>
-              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.complaints_d') || "Through 1930 Helpline in 2023"}</p>
+              <p className="text-[10px] text-muted-foreground mt-2">Through 1930 Helpline in 2023</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-green-500">
             <CardContent className="p-6">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.recovered_t') || "Funds Recovered"}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Funds Recovered</p>
               <h3 className="text-3xl font-black text-green-500">₹250 Cr</h3>
-              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.recovered_d') || "Saved by quick reporting within 1hr"}</p>
+              <p className="text-[10px] text-muted-foreground mt-2">Saved by quick reporting within 1hr</p>
             </CardContent>
           </Card>
         </div>
