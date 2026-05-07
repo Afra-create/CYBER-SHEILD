@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import OpenAI from 'openai';
 import admin from 'firebase-admin';
 
@@ -18,6 +19,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
+const FRONTEND_DEV_URL = 'http://localhost:5173';
 
 // ========== FIREBASE ADMIN INIT ==========
 let db = null;
@@ -51,12 +53,42 @@ const openai = new OpenAI({
 });
 const openaiReady = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'dummy_key';
 
-// ========== STATIC FILE SERVING (Unified Portal) ==========
+// ========== PROXY TO FRONTEND DEV SERVER (Development Mode) ==========
+// Set USE_DEV_PROXY=true to proxy to Vite dev server instead of dist
+const USE_DEV_PROXY = process.env.USE_DEV_PROXY === 'true' || process.env.NODE_ENV !== 'production';
+
 const hubDistPath = path.resolve(__dirname, '../artifacts/cyber-safety-hub/dist/public');
-app.use(express.static(hubDistPath));
+const frontendDistExists = fs.existsSync(path.join(hubDistPath, 'index.html'));
+
+if (USE_DEV_PROXY) {
+  console.log('🔄 Development mode: Proxying frontend to', FRONTEND_DEV_URL);
+  console.log('   (Set USE_DEV_PROXY=false to serve from dist)');
+  
+  // Proxy all non-API requests to Vite dev server
+  app.use('/', createProxyMiddleware({
+    target: FRONTEND_DEV_URL,
+    changeOrigin: true,
+    ws: true, // Enable WebSocket for HMR
+    logLevel: 'warn',
+    onProxyReq: (proxyReq, req, res) => {
+      // Add original URL to headers for debugging
+      proxyReq.setHeader('X-Original-URL', req.originalUrl);
+    }
+  }));
+} else if (frontendDistExists) {
+  console.log('📦 Production mode: Serving frontend from dist folder');
+  
+  // Serve static files from dist
+  app.use(express.static(hubDistPath));
+} else {
+  console.log('⚠️  Frontend dist not found and USE_DEV_PROXY is false');
+  console.log('   Run: cd artifacts/cyber-safety-hub && npm run build');
+}
 
 const videoDistPath = path.resolve(__dirname, '../artifacts/cyber-surakshit-video/dist/public');
-app.use('/cyber-surakshit-video', express.static(videoDistPath));
+if (fs.existsSync(videoDistPath)) {
+  app.use('/cyber-surakshit-video', express.static(videoDistPath));
+}
 
 // ========== MOCK DATABASE (Fallback) ==========
 const mockDatabase = {
@@ -504,19 +536,23 @@ app.get('/api/dashboard', async (req, res) => {
 });
 
 // ========== SPA FALLBACK ==========
-// Must be the last route — serves the frontend for any non-API, non-static path
-app.get(/^(?!\/api|\/cyber-surakshit-video).*$/, (req, res) => {
-  const indexPath = path.join(hubDistPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.json({
-      name: 'CyberAngel API',
-      status: 'running',
-      version: '2.0.0',
-      note: 'Frontend not built yet. Run: pnpm run portal:build'
-    });
+// Only needed if serving from dist, otherwise proxy handles everything
+app.get('/{*splat}', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api') || req.path.startsWith('/cyber-surakshit-video')) {
+    return next();
   }
+  
+  // If frontend dist exists, serve SPA
+  if (frontendDistExists) {
+    const indexPath = path.join(hubDistPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  
+  // Otherwise proxy handles it
+  next();
 });
 
 // ========== ERROR HANDLING & SERVER START ==========
