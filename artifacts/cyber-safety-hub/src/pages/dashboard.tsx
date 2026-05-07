@@ -197,6 +197,26 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+            {/* National Helpline */}
+            <Card className="bg-primary/90 text-primary-foreground shadow-2xl border-none overflow-hidden relative group">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent)] pointer-events-none" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 fill-white/20" />
+                  National Helpline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center text-center py-2">
+                  <h2 className="text-5xl font-black tracking-tighter mb-1 group-hover:scale-110 transition-transform cursor-default">1930</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Cybercrime Incident Support</p>
+                  <Button variant="secondary" className="mt-4 w-full rounded-xl font-bold bg-white text-primary hover:bg-white/90" onClick={() => window.open('tel:1930')}>
+                    Call Now
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Action Items */}
             <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-xl overflow-hidden border-t-4 border-t-destructive">
               <CardHeader className="border-b border-white/5 bg-white/5">
