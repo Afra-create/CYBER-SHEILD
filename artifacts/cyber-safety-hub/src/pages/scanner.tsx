@@ -81,7 +81,7 @@ export default function Scanner() {
       setIsScanning(false);
       clearInterval(interval);
       // Show error toast
-      alert("Failed to scan image. Please try again.");
+      alert(`Failed to scan image: ${error.message || "Please try again."}`);
     }
   };
 
