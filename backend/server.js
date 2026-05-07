@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
@@ -223,21 +223,35 @@ app.post('/api/scan', async (req, res) => {
 app.post('/api/scan-screenshot', async (req, res) => {
   const { image } = req.body;
   if (!image) return res.status(400).json({ error: 'Image data is required.' });
+  
   try {
     if (openaiReady) {
+      console.log('Sending screenshot to OpenAI...');
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "redFlags": ["string"], "recommendations": ["string"]}' },
+          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return ONLY a valid JSON object: {"isScam": boolean, "confidence": number, "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "redFlags": ["string"], "recommendations": ["string"]}' },
           { role: 'user', content: [
             { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
             { type: 'image_url', image_url: { url: image } }
           ]}
         ],
-        response_format: { type: 'json_object' }, max_tokens: 800
+        response_format: { type: 'json_object' },
+        max_tokens: 800
       });
-      return res.json(JSON.parse(response.choices[0].message.content));
+
+      const content = response.choices[0].message.content;
+      console.log('OpenAI Response received');
+      
+      try {
+        const parsedData = JSON.parse(content);
+        return res.json(parsedData);
+      } catch (parseError) {
+        console.error('Failed to parse OpenAI JSON:', content);
+        throw new Error('Invalid AI response format');
+      }
     } else {
+      // Fallback mock logic...
       const mockCategories = ['Phishing', 'OTP Fraud', 'Job Scam', 'Safe'];
       const isScam = Math.random() > 0.4;
       res.json({
@@ -255,8 +269,11 @@ app.post('/api/scan-screenshot', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Screenshot scan error:', error);
-    res.status(500).json({ error: 'Failed to analyze screenshot.' });
+    console.error('Screenshot scan error:', error.message);
+    if (error.response) {
+      console.error('OpenAI Error Details:', error.response.data);
+    }
+    res.status(500).json({ error: 'Failed to analyze screenshot: ' + error.message });
   }
 });
 
