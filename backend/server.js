@@ -228,7 +228,7 @@ app.post('/api/scan-screenshot', async (req, res) => {
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "recommendations": ["string"]}' },
+          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "redFlags": ["string"], "recommendations": ["string"]}' },
           { role: 'user', content: [
             { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
             { type: 'image_url', image_url: { url: image } }
@@ -245,6 +245,9 @@ app.post('/api/scan-screenshot', async (req, res) => {
         threatLevel: isScam ? 'High' : 'Low',
         category: isScam ? mockCategories[Math.floor(Math.random() * 3)] : 'Safe',
         summary: isScam ? 'This screenshot contains indicators of a scam.' : 'No significant threat indicators found.',
+        redFlags: isScam 
+          ? ['Generic greeting used instead of your name.', 'Grammatical errors in the text.', 'Sense of false urgency created.']
+          : [],
         recommendations: isScam
           ? ['Do not click any links.', 'Block the sender.', 'Report to your bank if financial details are mentioned.']
           : ['The message appears safe.', 'Verify sender identity through official channels.'],
