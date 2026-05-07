@@ -270,36 +270,21 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="relative group cursor-pointer"
+              className="relative group"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2, ease }}
-              onClick={() => window.location.href = '/cyber-surakshit-video/'}
             >
               <div className="absolute -inset-4 bg-primary/10 rounded-[40px] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="relative aspect-video rounded-[32px] overflow-hidden border border-border/50 shadow-2xl">
-                <img 
-                  src="/neighborhood.png" 
-                  alt="Cyber Surakshit Video" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                    <ChevronRight className="w-10 h-10 text-primary-foreground ml-1" />
-                  </div>
-                </div>
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl glass text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">{t('home.showcase_coming')}</p>
-                      <h4 className="font-bold text-sm">{t('home.showcase_mod1')}</h4>
-                    </div>
-                    <Badge variant="outline" className="text-white border-white/30 px-3 py-1 text-[10px]">
-                      12:45
-                    </Badge>
-                  </div>
-                </div>
+              <div className="relative aspect-video rounded-[32px] overflow-hidden border border-border/50 shadow-2xl bg-black">
+                <iframe 
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/Y7zZ6fKDM6w?rel=0" 
+                  title="What is Phishing?"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-view" 
+                  allowFullScreen
+                ></iframe>
               </div>
             </motion.div>
           </div>
