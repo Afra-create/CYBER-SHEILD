@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD74w-5-Dm4nZcbZBtNnXD_w6TR7fBhjNY",
@@ -14,5 +16,12 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-// Initialize Analytics conditionally to avoid errors during SSR or if not supported
+// Firestore
+export const db = getFirestore(app);
+
+// Auth
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
+
+// Analytics (client-side only)
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;

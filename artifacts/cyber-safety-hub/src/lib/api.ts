@@ -25,7 +25,8 @@ class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -37,7 +38,38 @@ class ApiClient {
 
   // Health check
   async healthCheck() {
-    return this.request<{ status: string; message: string }>('/api/health');
+    return this.request<{ status: string; message: string; firebase: string; openai: string }>('/api/health');
+  }
+
+  // Authentication - Signup
+  async signup(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    mobile?: string;
+    location?: string;
+  }) {
+    return this.request<{ message: string; userId: string }>('/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        mobile: data.mobile,
+        location: data.location,
+      }),
+    });
+  }
+
+  // Authentication - Login
+  async login(email: string, password: string) {
+    return this.request<{ message: string; userId: string; token: string }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
   }
 
   // Scan message/URL for threats
@@ -50,6 +82,22 @@ class ApiClient {
     }>('/api/scan', {
       method: 'POST',
       body: JSON.stringify({ text }),
+    });
+  }
+
+  // Scan screenshot for threats (AI Vision)
+  async scanScreenshot(image: string) {
+    return this.request<{
+      isScam: boolean;
+      confidence: number;
+      threatLevel: string;
+      category: string;
+      summary: string;
+      recommendations: string[];
+      source?: string;
+    }>('/api/scan-screenshot', {
+      method: 'POST',
+      body: JSON.stringify({ image }),
     });
   }
 
@@ -70,6 +118,7 @@ class ApiClient {
     content: string;
     description?: string;
     userEmail?: string;
+    attachmentUrl?: string;
   }) {
     return this.request<{
       message: string;
@@ -80,19 +129,74 @@ class ApiClient {
     });
   }
 
+  // Get reports
+  async getReports() {
+    return this.request<Array<{
+      id: string;
+      type: string;
+      content: string;
+      description?: string;
+      userEmail: string;
+      status: string;
+      createdAt: string;
+    }>>('/api/reports');
+  }
+
   // Get alerts
   async getAlerts() {
     return this.request<Array<{
-      id: number;
+      id: string;
       type: string;
       message: string;
       date: string;
       severity: string;
+      region?: string;
     }>>('/api/alerts');
   }
 
+  // Get lessons
+  async getLessons() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      category: string;
+      duration: string;
+      description: string;
+      videoUrl: string;
+    }>>('/api/lessons');
+  }
+
+  // Get trainer scenarios
+  async getTrainerScenarios() {
+    return this.request<Array<{
+      id: number;
+      title: string;
+      type: string;
+      content: string;
+      correct: boolean;
+    }>>('/api/trainer/scenarios');
+  }
+
+  // Submit trainer answer
+  async submitTrainerAnswer(data: {
+    userId: string;
+    scenarioId: number;
+    userAnswer: boolean;
+    correctAnswer: boolean;
+  }) {
+    return this.request<{
+      isCorrect: boolean;
+      xpGained: number;
+      newXp: number;
+    }>('/api/trainer/submit', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Get dashboard data
-  async getDashboardData() {
+  async getDashboardData(userId?: string) {
+    const query = userId ? `?userId=${userId}` : '';
     return this.request<{
       userStats: {
         level: string;
@@ -101,6 +205,9 @@ class ApiClient {
         modulesCompleted: number;
         totalModules: number;
         reportsSubmitted: number;
+        totalReports: number;
+        accuracy: number;
+        badges: string[];
       };
       scamTrends: Array<{
         name: string;
@@ -112,29 +219,34 @@ class ApiClient {
         month: string;
         reports: number;
       }>;
-    }>('/api/dashboard');
+    }>(`/api/dashboard${query}`);
   }
 
   // Get user progress
-  async getUserProgress() {
+  async getUserProgress(userId?: string) {
+    const query = userId ? `?userId=${userId}` : '';
     return this.request<{
+      userId: string;
       level: string;
       xp: number;
+      xpToNext: number;
       badges: string[];
       completedModules: string[];
       streak: number;
-    }>('/api/user/progress');
+      totalReports: number;
+      accuracy: number;
+    }>(`/api/user/progress${query}`);
   }
 
   // Update user progress
-  async updateProgress(moduleId: string, xpGained: number) {
+  async updateProgress(data: { userId?: string; moduleId: string; xpGained: number }) {
     return this.request<{
       success: boolean;
       newXp: number;
       newLevel?: string;
     }>('/api/user/progress', {
       method: 'POST',
-      body: JSON.stringify({ moduleId, xpGained }),
+      body: JSON.stringify(data),
     });
   }
 }

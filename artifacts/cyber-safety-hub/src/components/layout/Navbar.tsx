@@ -12,7 +12,8 @@ import {
   Globe,
   Menu,
   X,
-  Search
+  Search,
+  MessageSquare
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export function Navbar() {
     { href: "/learn", label: t('nav.learn'), icon: BookOpen },
     { href: "/trainer", label: t('nav.trainer'), icon: Gamepad2 },
     { href: "/scanner", label: t('nav.scanner'), icon: Search },
+    { href: "/chat", label: t('nav.chat') || "AI Help", icon: MessageSquare },
     { href: "/cyber-surakshit-video", label: t('nav.learn'), icon: Gamepad2, external: true },
     { href: "/report", label: t('nav.report'), icon: AlertTriangle },
     { href: "/dashboard", label: t('nav.dashboard'), icon: LayoutDashboard },

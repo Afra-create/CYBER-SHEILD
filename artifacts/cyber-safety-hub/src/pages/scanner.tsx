@@ -19,6 +19,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { apiClient } from "@/lib/api";
 
 interface ScanResult {
   isScam: boolean;
@@ -66,13 +67,7 @@ export default function Scanner() {
     }, 100);
 
     try {
-      const response = await fetch("/api/scan-screenshot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: selectedImage })
-      });
-
-      const data = await response.json();
+      const data = await apiClient.scanScreenshot(selectedImage);
       setScanProgress(100);
       
       setTimeout(() => {
@@ -83,8 +78,9 @@ export default function Scanner() {
     } catch (error) {
       console.error("Scan failed:", error);
       setIsScanning(false);
-    } finally {
       clearInterval(interval);
+      // Show error toast
+      alert("Failed to scan image. Please try again.");
     }
   };
 

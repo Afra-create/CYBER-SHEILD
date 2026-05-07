@@ -23,6 +23,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
+import { apiClient } from "@/lib/api";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -54,18 +55,34 @@ export default function Signup() {
     },
   });
 
-  const onDetailsSubmit = (data: SignupFormValues) => {
+  const onDetailsSubmit = async (data: SignupFormValues) => {
     setIsSubmitting(true);
-    console.log("Details submitted:", data);
-    // Simulate OTP sending
-    setTimeout(() => {
+    try {
+      // Call the actual signup API
+      const result = await apiClient.signup({
+        email: data.email,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        mobile: data.mobile,
+        location: data.location,
+      });
+      
+      console.log("Signup successful:", result);
       setIsSubmitting(false);
       setStep("otp");
       toast({
         title: "OTP Sent",
         description: "A dummy OTP has been sent to your mobile number.",
       });
-    }, 1000);
+    } catch (error: any) {
+      setIsSubmitting(false);
+      toast({
+        title: "Signup Failed",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const onOtpSubmit = () => {
