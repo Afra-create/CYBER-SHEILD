@@ -238,14 +238,14 @@ importers:
         specifier: ^12.12.1
         version: 12.12.1
       i18next:
-        specifier: ^26.0.8
-        version: 26.0.8(typescript@5.9.3)
+        specifier: ^26.0.9
+        version: 26.0.9(typescript@5.9.3)
       i18next-browser-languagedetector:
         specifier: ^8.2.1
         version: 8.2.1
       react-i18next:
         specifier: ^17.0.6
-        version: 17.0.6(i18next@26.0.8(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
+        version: 17.0.6(i18next@26.0.9(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
@@ -2748,7 +2748,7 @@ packages:
         optional: true
 
   fflate@0.6.10:
-    resolution: {integrity: sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg==}
+    resolution: {integrity: sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg==, tarball: https://registry.npmjs.org/fflate/-/fflate-0.6.10.tgz}
 
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
@@ -2896,8 +2896,8 @@ packages:
   i18next-browser-languagedetector@8.2.1:
     resolution: {integrity: sha512-bZg8+4bdmaOiApD7N7BPT9W8MLZG+nPTOFlLiJiT8uzKXFjhxw4v2ierCXOwB5sFDMtuA5G4kgYZ0AznZxQ/cw==}
 
-  i18next@26.0.8:
-    resolution: {integrity: sha512-BRzLom0mhDhV9v0QhgUUHWQJuwFmnr1194xEcNLYD6ym8y8s542n4jXUvRLnhNTbh9PmpU6kGZamyuGHQMsGjw==}
+  i18next@26.0.9:
+    resolution: {integrity: sha512-htjWlK5lGpjIDJxUdDLD6dO2jPl/RZHBpeZC80T5yr6Lci/tN3Oq9Doh9110ihliAIb4xmb45ngM76WcbP6GjA==}
     peerDependencies:
       typescript: ^5 || ^6
     peerDependenciesMeta:
@@ -6398,7 +6398,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.6
 
-  i18next@26.0.8(typescript@5.9.3):
+  i18next@26.0.9(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
@@ -6884,11 +6884,11 @@ snapshots:
     dependencies:
       react: 19.1.0
 
-  react-i18next@17.0.6(i18next@26.0.8(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3):
+  react-i18next@17.0.6(i18next@26.0.9(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.29.2
       html-parse-stringify: 3.0.1
-      i18next: 26.0.8(typescript@5.9.3)
+      i18next: 26.0.9(typescript@5.9.3)
       react: 19.1.0
       use-sync-external-store: 1.6.0(react@19.1.0)
     optionalDependencies:
