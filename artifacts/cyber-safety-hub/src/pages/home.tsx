@@ -36,6 +36,7 @@ function CornerMark({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {
 
 export default function Home() {
   const { t } = useTranslation();
+  const [videoError, setVideoError] = React.useState(false);
 
   const STATS = [
     { icon: Users,         value: "142K+", label: t('home.stats_citizens'),           color: "text-primary" },
@@ -78,18 +79,21 @@ export default function Home() {
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <div className="relative w-full h-full">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              className="absolute inset-0 w-full h-full object-cover opacity-60"
-              poster="/neighborhood.png"
-            >
-              <source src="/videos/hero.mp4" type="video/mp4" />
-              {/* Fallback to original animation if video fails */}
+            {!videoError ? (
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="absolute inset-0 w-full h-full object-cover opacity-60"
+                poster="/neighborhood.png"
+                onError={() => setVideoError(true)}
+              >
+                <source src="/videos/hero.mp4" type="video/mp4" />
+              </video>
+            ) : (
               <CyberShieldAnimation />
-            </video>
+            )}
           </div>
         </motion.div>
 
