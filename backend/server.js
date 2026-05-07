@@ -478,12 +478,19 @@ app.get('/api/dashboard', async (req, res) => {
     else if (reportsToday > 20) threatLevel = "High";
     else if (reportsToday > 5) threatLevel = "Elevated";
 
+    const progress = userProgress || mockDatabase.userProgress.default;
+
     res.json({
       userStats: {
-        level: userProgress.level, xp: userProgress.xp, xpToNext: userProgress.xpToNext,
-        modulesCompleted: (userProgress.completedModules || []).length, totalModules: 12,
-        badges: userProgress.badges || [], totalReports: userProgress.totalReports || 0,
-        reportsSubmitted: userProgress.totalReports || 0, accuracy: userProgress.accuracy || 0
+        level: progress.level || 'Defender', 
+        xp: progress.xp || 0, 
+        xpToNext: progress.xpToNext || 500,
+        modulesCompleted: (progress.completedModules || []).length, 
+        totalModules: 12,
+        badges: progress.badges || [], 
+        totalReports: progress.totalReports || 0,
+        reportsSubmitted: progress.totalReports || 0, 
+        accuracy: progress.accuracy || 0
       },
       communityStats: {
         totalReportsFiled: totalReports + 1300000, // Adding a base to make it look national
