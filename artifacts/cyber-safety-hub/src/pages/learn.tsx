@@ -290,7 +290,7 @@ export default function Learn() {
       progress: 100,
       color: "bg-blue-500",
       completed: true,
-      videoUrl: "https://www.youtube.com/embed/Y7zNIGMELQ4?si=rX1X-uE2yE-1",
+      videoUrl: `/video/?module=phishing`,
       videoTitle: "What is Phishing and How to Avoid It"
     },
     {
@@ -302,7 +302,7 @@ export default function Learn() {
       progress: 40,
       color: "bg-orange-500",
       completed: false,
-      videoUrl: "https://www.youtube.com/embed/n3HsswD4pD0?si=pX1X",
+      videoUrl: `/video/?module=otp`,
       videoTitle: "How to stay safe from OTP Frauds"
     },
     {
@@ -314,7 +314,7 @@ export default function Learn() {
       progress: 0,
       color: "bg-purple-500",
       completed: false,
-      videoUrl: "https://www.youtube.com/embed/hO-g-q251L8?si=qX1X",
+      videoUrl: `/video/?module=job`,
       videoTitle: "Beware of Fake Job Offers"
     },
     {
@@ -326,7 +326,7 @@ export default function Learn() {
       progress: 0,
       color: "bg-rose-500",
       completed: false,
-      videoUrl: "https://www.youtube.com/embed/8v_g-Zf_Kyo?si=sX1X",
+      videoUrl: `/video/?module=social`,
       videoTitle: "Social Media Impersonation Scams"
     }
   ];

@@ -142,6 +142,22 @@ function ControlBar({
 }
 
 export default function VideoWithControls() {
+  const [moduleTitle, setModuleTitle] = useState("Interactive Lesson");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mod = params.get("module");
+    const titles: Record<string, string> = {
+      phishing: "Phishing Defense Simulation",
+      otp: "OTP Fraud Awareness",
+      job: "Employment Scam Identification",
+      social: "Social Media Safety Check"
+    };
+    if (mod && titles[mod]) {
+      setModuleTitle(titles[mod]);
+    }
+  }, []);
+
   const {
     sceneKeys,
     activeIndex,
@@ -228,7 +244,7 @@ export default function VideoWithControls() {
         <div className="flex items-center gap-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 shadow-xl">
           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span className="text-white/80 text-sm font-bold tracking-widest uppercase">
-            Live Showcase
+            {moduleTitle}
           </span>
         </div>
       </div>
