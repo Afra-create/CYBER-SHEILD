@@ -8,7 +8,7 @@
  const cn = (...classes: any[]) => classes.filter(Boolean).join(' '); 
  
  // The main hero component 
- const CyberMatrixHero = () => { 
+ const CyberMatrixHero = ({ className = "fixed" }: { className?: string }) => { 
      const gridRef = useRef<HTMLDivElement>(null); 
      const [isClient, setIsClient] = useState(false); 
  
@@ -109,9 +109,9 @@
      }; 
  
      return ( 
-         <div className="fixed inset-0 -z-10 w-full h-full bg-black overflow-hidden pointer-events-none"> 
+         <div className={cn("inset-0 -z-10 w-full h-full bg-transparent overflow-hidden pointer-events-none", className)}> 
              {/* Animated Grid Background */} 
-             <div ref={gridRef} id="tiles" className="opacity-40"></div> 
+             <div ref={gridRef} id="tiles" className="opacity-20"></div> 
              
              <style>{` 
                  #tiles { 
@@ -119,8 +119,8 @@
                      display: grid; 
                      grid-template-columns: repeat(var(--columns), 1fr); 
                      grid-template-rows: repeat(var(--rows), 1fr); 
-                     width: 100vw; 
-                     height: 100vh; 
+                     width: 100%; 
+                     height: 100%; 
                      position: absolute; 
                      top: 0; 
                      left: 0; 
@@ -131,12 +131,12 @@
                      justify-content: center; 
                      align-items: center; 
                      font-family: 'Courier New', Courier, monospace; 
-                     font-size: 1rem; 
+                     font-size: 0.8rem; 
                      
                      /* Use CSS variable for dynamic styling */ 
                      opacity: calc(0.05 + var(--intensity) * 0.5); 
-                     color: hsl(120, 100%, calc(30% + var(--intensity) * 40%)); 
-                     text-shadow: 0 0 calc(var(--intensity) * 8px) hsl(120, 100%, 50%); 
+                     color: hsl(210, 100%, calc(30% + var(--intensity) * 40%)); 
+                     text-shadow: 0 0 calc(var(--intensity) * 8px) hsl(210, 100%, 50%); 
                      transform: scale(calc(0.9 + var(--intensity) * 0.1)); 
                      transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease; 
                  } 
@@ -144,9 +144,9 @@
                      animation: glitch-anim 0.2s ease; 
                  } 
                  @keyframes glitch-anim { 
-                     0% { transform: scale(1); color: #0f0; } 
+                     0% { transform: scale(1); color: #3b82f6; } 
                      50% { transform: scale(1.1); color: #fff; text-shadow: 0 0 5px #fff; } 
-                     100% { transform: scale(1); color: #0f0; } 
+                     100% { transform: scale(1); color: #3b82f6; } 
                  } 
              `}</style> 
          </div> 

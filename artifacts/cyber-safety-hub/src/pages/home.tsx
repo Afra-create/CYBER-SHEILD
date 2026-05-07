@@ -80,19 +80,25 @@ export default function Home() {
         >
           <div className="relative w-full h-full">
             {!videoError ? (
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline 
-                className="absolute inset-0 w-full h-full object-cover opacity-60"
-                poster="/neighborhood.png"
-                onError={() => setVideoError(true)}
-              >
-                <source src="/videos/hero.mp4" type="video/mp4" />
-              </video>
+              <>
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="absolute inset-0 w-full h-full object-cover opacity-60"
+                  poster="/neighborhood.png"
+                  onError={() => setVideoError(true)}
+                >
+                  <source src="/videos/hero.mp4" type="video/mp4" />
+                </video>
+                <CyberMatrixHero className="absolute" />
+              </>
             ) : (
-              <CyberShieldAnimation />
+              <div className="relative w-full h-full">
+                <CyberShieldAnimation />
+                <CyberMatrixHero className="absolute" />
+              </div>
             )}
           </div>
         </motion.div>
