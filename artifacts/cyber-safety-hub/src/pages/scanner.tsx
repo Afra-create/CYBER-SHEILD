@@ -76,12 +76,12 @@ export default function Scanner() {
         setResult(data);
       }, 500);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Scan failed:", error);
       setIsScanning(false);
       clearInterval(interval);
       // Show error toast
-      alert(`Failed to scan image: ${error.message || "Please try again."}`);
+      alert(`Failed to scan image: ${error?.message || "Please try again."}`);
     }
   };
 
