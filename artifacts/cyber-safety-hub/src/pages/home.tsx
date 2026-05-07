@@ -77,8 +77,19 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <div className="w-full h-full">
-            <CyberShieldAnimation />
+          <div className="relative w-full h-full">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+              poster="/neighborhood.png"
+            >
+              <source src="/videos/hero.mp4" type="video/mp4" />
+              {/* Fallback to original animation if video fails */}
+              <CyberShieldAnimation />
+            </video>
           </div>
         </motion.div>
 

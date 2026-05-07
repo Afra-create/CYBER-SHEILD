@@ -290,7 +290,7 @@ export default function Learn() {
       progress: 100,
       color: "bg-blue-500",
       completed: true,
-      videoUrl: `/video/?module=phishing`,
+      videoUrl: `/videos/phishing.mp4`,
       videoTitle: "What is Phishing and How to Avoid It"
     },
     {
@@ -302,7 +302,7 @@ export default function Learn() {
       progress: 40,
       color: "bg-orange-500",
       completed: false,
-      videoUrl: `/video/?module=otp`,
+      videoUrl: `/videos/otp.mp4`,
       videoTitle: "How to stay safe from OTP Frauds"
     },
     {
@@ -314,7 +314,7 @@ export default function Learn() {
       progress: 0,
       color: "bg-purple-500",
       completed: false,
-      videoUrl: `/video/?module=job`,
+      videoUrl: `/videos/job.mp4`,
       videoTitle: "Beware of Fake Job Offers"
     },
     {
@@ -326,7 +326,7 @@ export default function Learn() {
       progress: 0,
       color: "bg-rose-500",
       completed: false,
-      videoUrl: `/video/?module=social`,
+      videoUrl: `/videos/social.mp4`,
       videoTitle: "Social Media Impersonation Scams"
     }
   ];
@@ -640,13 +640,22 @@ export default function Learn() {
                          <span className="font-bold">{t('learn.close_lesson')}</span>
                        </Button>
                     </div>
-                    <iframe 
-                      src={activeModule?.videoUrl || `/video/?module=${activeModule?.id}`} 
-                      title={activeModule?.videoTitle || "Interactive Video Lesson"}
-                      className="w-full flex-1 border-0 bg-black"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    {activeModule?.videoUrl?.endsWith('.mp4') ? (
+                      <video 
+                        src={activeModule.videoUrl} 
+                        controls 
+                        autoPlay 
+                        className="w-full flex-1 bg-black"
+                      />
+                    ) : (
+                      <iframe 
+                        src={activeModule?.videoUrl} 
+                        title={activeModule?.videoTitle || "Interactive Video Lesson"}
+                        className="w-full flex-1 border-0 bg-black"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    )}
                   </motion.div>
                 ) : (
                   <div className="bg-card/40 backdrop-blur-xl border border-border/50 rounded-[2.5rem] overflow-hidden shadow-2xl">
