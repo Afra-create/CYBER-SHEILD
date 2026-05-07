@@ -32,6 +32,13 @@ const REPORTS_DATA = [
   { month: 'Jun', reports: 350 },
 ];
 
+const NATIONAL_STATS = [
+  { category: 'UPI Fraud', percentage: 55, color: 'bg-primary' },
+  { category: 'Phishing', percentage: 22, color: 'bg-orange-500' },
+  { category: 'Investment', percentage: 15, color: 'bg-blue-500' },
+  { category: 'Other', percentage: 8, color: 'bg-muted' },
+];
+
 export default function Dashboard() {
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ['dashboard'],
@@ -57,6 +64,7 @@ export default function Dashboard() {
   const userStats = dashboardData?.userStats;
   const scamTrends = dashboardData?.scamTrends || SCAM_TRENDS_DATA;
   const reportsData = dashboardData?.reportsData || REPORTS_DATA;
+  const { t } = useTranslation();
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl relative">
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none blur-3xl" />
@@ -78,63 +86,35 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-card/40 backdrop-blur-xl border-primary/30 shadow-xl shadow-primary/5 relative overflow-hidden group transition-all duration-300 hover:shadow-primary/10 hover:border-primary/50">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors" />
+          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-primary">
             <CardContent className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Your Level</p>
-                  <h3 className="text-2xl font-bold text-primary flex items-center gap-2">
-                    <Shield className="w-6 h-6" /> Defender
-                  </h3>
-                </div>
-                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center border border-primary/20">
-                  <Award className="w-5 h-5 text-primary" />
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="flex justify-between text-xs font-medium mb-1.5">
-                  <span>240 XP</span>
-                  <span className="text-muted-foreground">500 XP to Expert</span>
-                </div>
-                <Progress value={48} className="h-2 bg-primary/10 border border-primary/5" />
-              </div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.national_loss_t') || "National Financial Loss"}</p>
+              <h3 className="text-3xl font-black text-primary">₹1,750 Cr+</h3>
+              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.national_loss_d') || "Reported in 2023 across India"}</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-orange-500">
+            <CardContent className="p-6">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.upi_scams_t') || "UPI Fraud Volume"}</p>
+              <h3 className="text-3xl font-black text-orange-500">55%</h3>
+              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.upi_scams_d') || "Of all financial crimes are UPI-based"}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg hover:border-blue-500/30 transition-all duration-300">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-blue-500/20 shadow-inner">
-                <BookOpen className="w-6 h-6 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Modules Completed</p>
-                <h3 className="text-2xl font-bold">{userStats?.modulesCompleted || 0} / {userStats?.totalModules || 12}</h3>
-              </div>
+          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-blue-500">
+            <CardContent className="p-6">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.complaints_t') || "Complaints Registered"}</p>
+              <h3 className="text-3xl font-black text-blue-500">1.3M+</h3>
+              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.complaints_d') || "Through 1930 Helpline in 2023"}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg hover:border-destructive/30 transition-all duration-300">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 bg-destructive/10 rounded-2xl flex items-center justify-center shrink-0 border border-destructive/20 shadow-inner">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Scams Reported</p>
-                <h3 className="text-2xl font-bold">{userStats?.reportsSubmitted || 0}</h3>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg hover:border-green-500/30 transition-all duration-300">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-green-500/20 shadow-inner">
-                <Activity className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Community Rank</p>
-                <h3 className="text-2xl font-bold pl-1">Top 15%</h3>
-              </div>
+          <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-lg border-l-4 border-l-green-500">
+            <CardContent className="p-6">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('dash.recovered_t') || "Funds Recovered"}</p>
+              <h3 className="text-3xl font-black text-green-500">₹250 Cr</h3>
+              <p className="text-[10px] text-muted-foreground mt-2">{t('dash.recovered_d') || "Saved by quick reporting within 1hr"}</p>
             </CardContent>
           </Card>
         </div>
@@ -169,21 +149,34 @@ export default function Dashboard() {
 
             <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-xl overflow-hidden">
               <CardHeader className="border-b border-white/5 bg-white/5">
-                <CardTitle>Your Reporting Impact</CardTitle>
-                <CardDescription>Monthly reports submitted by you</CardDescription>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-primary" />
+                  National Crime Breakdown
+                </CardTitle>
+                <CardDescription>Estimated distribution of cybercrime types in India (MHA Data)</CardDescription>
               </CardHeader>
-              <CardContent className="h-[200px] w-full pt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={reportsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                    <RechartsTooltip 
-                      contentStyle={{ backgroundColor: 'rgba(23, 23, 23, 0.8)', borderColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                    />
-                    <Line type="monotone" dataKey="reports" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ fill: 'hsl(var(--primary))', r: 4 }} activeDot={{ r: 6 }} />
-                  </LineChart>
-                </ResponsiveContainer>
+              <CardContent className="pt-8 space-y-6">
+                {NATIONAL_STATS.map((stat) => (
+                  <div key={stat.category} className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium">{stat.category}</span>
+                      <span className="font-black text-primary">{stat.percentage}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${stat.percentage}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className={`h-full ${stat.color} rounded-full`}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 mt-4">
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    * Data based on National Cyber Crime Reporting Portal (NCRP) annual summaries. Financial frauds remain the dominant threat.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -204,36 +197,46 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+            {/* National Helpline */}
+            <Card className="bg-primary/90 text-primary-foreground shadow-2xl border-none overflow-hidden relative group">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent)] pointer-events-none" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 fill-white/20" />
+                  National Helpline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center text-center py-2">
+                  <h2 className="text-5xl font-black tracking-tighter mb-1 group-hover:scale-110 transition-transform cursor-default">1930</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Cybercrime Incident Support</p>
+                  <Button variant="secondary" className="mt-4 w-full rounded-xl font-bold bg-white text-primary hover:bg-white/90" onClick={() => window.open('tel:1930')}>
+                    Call Now
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Action Items */}
-            <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-xl overflow-hidden">
+            <Card className="bg-card/40 backdrop-blur-md border-white/10 shadow-xl overflow-hidden border-t-4 border-t-destructive">
               <CardHeader className="border-b border-white/5 bg-white/5">
-                <CardTitle className="text-lg">Up Next For You</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
+                  Live Security Alerts
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
-                <div className="bg-white/5 rounded-2xl p-4 flex flex-col gap-3 border border-white/5 hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center border border-orange-500/20">
-                      <Shield className="w-5 h-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">Resume: OTP Frauds</p>
-                      <p className="text-xs text-muted-foreground">Module • 40% Complete</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="secondary" className="w-full rounded-xl bg-white/10 hover:bg-white/20 border-none">Continue Learning</Button>
+                <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20">
+                  <p className="text-xs font-bold text-destructive mb-1">HIGH ALERT: Aadhaar/Biometric Scams</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">Scammers using cloned fingerprints to bypass AePS (Aadhaar Enabled Payment System).</p>
                 </div>
-
-                <div className="bg-white/5 rounded-2xl p-4 flex flex-col gap-3 border border-white/5 hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
-                      <Activity className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">New Trainer Scenario</p>
-                      <p className="text-xs text-muted-foreground">Practice • +20 XP</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="outline" className="w-full rounded-xl border-primary/30 hover:bg-primary/10">Start Practice</Button>
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                  <p className="text-xs font-bold text-primary mb-1">NEW TREND: FedEx/Courier Scams</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">Fake 'narcotics' parcels used to blackmail citizens. Do not pay any "legal fees" via UPI.</p>
+                </div>
+                <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <p className="text-xs font-bold text-orange-500 mb-1">UPI Safety Tip</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">Receiving money NEVER requires you to enter your UPI PIN. Scan only to PAY, never to receive.</p>
                 </div>
               </CardContent>
             </Card>
