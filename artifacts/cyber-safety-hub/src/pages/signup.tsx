@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -39,6 +40,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [step, setStep] = useState<"details" | "otp">("details");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpValue, setOtpValue] = useState("");
@@ -136,12 +138,12 @@ export default function Signup() {
               <Shield className="w-6 h-6 text-primary" />
             </div>
             <CardTitle className="text-3xl font-bold tracking-tight">
-              {step === "details" ? "Join CyberAngel" : "Verify Identity"}
+              {step === "details" ? t('signup.join_title') : t('signup.verify_title')}
             </CardTitle>
             <CardDescription>
               {step === "details" 
-                ? "Protect your family's digital world today" 
-                : "Enter the 6-digit code sent to your phone"}
+                ? t('signup.join_desc') 
+                : t('signup.verify_desc')}
             </CardDescription>
           </CardHeader>
 
@@ -155,8 +157,8 @@ export default function Signup() {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full mb-6 py-6 border-border/60 hover:bg-secondary/50 transition-all flex items-center justify-center gap-3 font-semibold"
                     onClick={handleGoogleLogin}
                   >
@@ -178,7 +180,7 @@ export default function Signup() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    Continue with Google
+                    {t('signup.google_btn')}
                   </Button>
 
                   <div className="relative mb-6">
@@ -186,7 +188,7 @@ export default function Signup() {
                       <span className="w-full border-t border-border/60"></span>
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">Or sign up with email</span>
+                      <span className="bg-background px-2 text-muted-foreground">{t('signup.or_email')}</span>
                     </div>
                   </div>
 
@@ -198,7 +200,7 @@ export default function Signup() {
                           name="firstName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>First Name</FormLabel>
+                              <FormLabel>{t('signup.first_name')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -214,7 +216,7 @@ export default function Signup() {
                           name="lastName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Last Name</FormLabel>
+                              <FormLabel>{t('signup.last_name')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="Doe" {...field} />
                               </FormControl>
@@ -229,7 +231,7 @@ export default function Signup() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{t('signup.email')}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -246,7 +248,7 @@ export default function Signup() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t('signup.password')}</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -264,7 +266,7 @@ export default function Signup() {
                           name="mobile"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Mobile Number</FormLabel>
+                              <FormLabel>{t('signup.mobile')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <Phone className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -280,7 +282,7 @@ export default function Signup() {
                           name="location"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Location</FormLabel>
+                              <FormLabel>{t('signup.location')}</FormLabel>
                               <FormControl>
                                 <div className="relative">
                                   <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -294,7 +296,7 @@ export default function Signup() {
                       </div>
 
                       <Button type="submit" className="w-full py-6 text-base font-bold" disabled={isSubmitting}>
-                        {isSubmitting ? "Processing..." : "Continue to Verification"}
+                        {isSubmitting ? t('signup.processing') : t('signup.continue_btn')}
                         <ArrowRight className="ml-2 w-5 h-5" />
                       </Button>
                     </form>
@@ -339,21 +341,21 @@ export default function Signup() {
                       onClick={onOtpSubmit}
                       disabled={isSubmitting || otpValue.length !== 6}
                     >
-                      {isSubmitting ? "Verifying..." : "Create My Account"}
+                      {isSubmitting ? t('signup.verifying') : t('signup.verify_btn')}
                       <CheckCircle2 className="ml-2 w-5 h-5" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="w-full text-muted-foreground hover:text-foreground"
                       onClick={() => setStep("details")}
                       disabled={isSubmitting}
                     >
-                      Back to details
+                      {t('signup.back_details')}
                     </Button>
                   </div>
 
                   <p className="mt-8 text-sm text-muted-foreground">
-                    Didn't receive the code? <Button variant="link" className="p-0 h-auto font-bold text-primary">Resend OTP</Button>
+                    {t('signup.resend')} <Button variant="link" className="p-0 h-auto font-bold text-primary">{t('signup.resend_btn')}</Button>
                   </p>
                 </motion.div>
               )}
@@ -362,9 +364,9 @@ export default function Signup() {
 
           <CardFooter className="flex flex-col items-center border-t border-border/40 pt-6 bg-secondary/20">
             <p className="text-sm text-muted-foreground">
-              By joining, you agree to our{" "}
-              <Button variant="link" className="p-0 h-auto text-xs font-semibold">Terms of Service</Button> and{" "}
-              <Button variant="link" className="p-0 h-auto text-xs font-semibold">Privacy Policy</Button>.
+              {t('signup.terms')}{" "}
+              <Button variant="link" className="p-0 h-auto text-xs font-semibold">{t('signup.terms_link')}</Button> {t('signup.and')}{" "}
+              <Button variant="link" className="p-0 h-auto text-xs font-semibold">{t('signup.privacy_link')}</Button>.
             </p>
           </CardFooter>
         </Card>

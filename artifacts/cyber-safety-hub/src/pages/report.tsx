@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const reportSchema = z.object({
   category: z.string().min(1, "Please select a category"),
@@ -29,6 +30,7 @@ export default function Report() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
@@ -85,10 +87,10 @@ export default function Report() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 text-destructive flex items-center gap-3">
           <AlertTriangle className="w-8 h-8" />
-          Report a Cyber Threat
+          {t('report.title')}
         </h1>
         <p className="text-muted-foreground max-w-2xl">
-          Help us keep the community safe. Report suspicious messages, fake websites, or potential scams. Your report is anonymous and helps train our systems.
+          {t('report.subtitle')}
         </p>
       </div>
 
@@ -105,8 +107,8 @@ export default function Report() {
               >
                 <Card>
                   <CardHeader>
-                    <CardTitle>Incident Details</CardTitle>
-                    <CardDescription>Provide as much information as possible about the suspicious activity.</CardDescription>
+                    <CardTitle>{t('report.form_title')}</CardTitle>
+                    <CardDescription>{t('report.form_desc')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Form {...form}>
@@ -118,18 +120,18 @@ export default function Report() {
                             name="category"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Scam Category</FormLabel>
+                                <FormLabel>{t('report.category_label')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Select type of scam" />
+                                      <SelectValue placeholder={t('report.category_placeholder')} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="phishing">Phishing Link / Fake Website</SelectItem>
-                                    <SelectItem value="bank">Bank / OTP Fraud</SelectItem>
-                                    <SelectItem value="job">Fake Job Offer</SelectItem>
-                                    <SelectItem value="social">Social Media Impersonation</SelectItem>
+                                    <SelectItem value="phishing">{t('learn.mod_phish_t')}</SelectItem>
+                                    <SelectItem value="bank">{t('learn.mod_otp_t')}</SelectItem>
+                                    <SelectItem value="job">{t('learn.mod_job_t')}</SelectItem>
+                                    <SelectItem value="social">{t('learn.mod_soc_t')}</SelectItem>
                                     <SelectItem value="blackmail">Blackmail / Extortion</SelectItem>
                                     <SelectItem value="other">Other</SelectItem>
                                   </SelectContent>
@@ -144,11 +146,11 @@ export default function Report() {
                             name="platform"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Where did it happen?</FormLabel>
+                                <FormLabel>{t('report.platform_label')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Platform" />
+                                      <SelectValue placeholder={t('report.platform_placeholder')} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -171,11 +173,11 @@ export default function Report() {
                           name="suspiciousLink"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Suspicious Link (Optional)</FormLabel>
+                              <FormLabel>{t('report.link_label')}</FormLabel>
                               <FormControl>
                                 <Input placeholder="e.g. http://fake-bank-update.com" {...field} />
                               </FormControl>
-                              <FormDescription>If the scammer sent a link, paste it here.</FormDescription>
+                              <FormDescription>{t('report.link_desc')}</FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -186,10 +188,10 @@ export default function Report() {
                           name="description"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Message Content / Description</FormLabel>
+                              <FormLabel>{t('report.content_label')}</FormLabel>
                               <FormControl>
                                 <Textarea 
-                                  placeholder="Paste the exact message received or describe what happened..." 
+                                  placeholder={t('report.content_placeholder')} 
                                   className="min-h-[120px]"
                                   {...field} 
                                 />
@@ -201,7 +203,7 @@ export default function Report() {
 
                         {/* File Upload UI */}
                         <div>
-                          <p className="mb-3 block text-sm font-medium leading-none">Screenshot Evidence (Optional)</p>
+                          <p className="mb-3 block text-sm font-medium leading-none">{t('report.file_label')}</p>
                           <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:bg-secondary/50 transition-colors relative">
                             <input 
                               type="file" 
@@ -232,14 +234,14 @@ export default function Report() {
                                   <Upload className="w-6 h-6 text-muted-foreground" />
                                 </div>
                                 <p className="text-sm font-medium">Click or drag image to upload</p>
-                                <p className="text-xs text-muted-foreground">PNG, JPG up to 5MB</p>
+                                <p className="text-xs text-muted-foreground">{t('report.file_desc')}</p>
                               </div>
                             )}
                           </div>
                         </div>
 
                         <Button type="submit" className="w-full h-12 text-lg" disabled={isSubmitting}>
-                          {isSubmitting ? "Submitting Report..." : "Submit Report"}
+                          {isSubmitting ? t('report.submitting_btn') : t('report.submit_btn')}
                         </Button>
                       </form>
                     </Form>
@@ -257,17 +259,17 @@ export default function Report() {
                 <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ShieldCheck className="w-12 h-12 text-green-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-4">Report Registered</h2>
+                <h2 className="text-3xl font-bold mb-4">{t('report.success_title')}</h2>
                 <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto">
-                  Thank you for contributing to CyberAngel. Your report helps protect others from falling victim to similar scams.
+                  {t('report.success_desc')}
                 </p>
                 <div className="bg-secondary/50 rounded-xl p-4 inline-block mb-8 border border-border">
-                  <p className="text-sm text-muted-foreground mb-1">Report Reference ID</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t('report.ref_id')}</p>
                   <p className="font-mono text-xl font-bold text-primary">#HGC-{Math.floor(Math.random() * 90000) + 10000}</p>
                 </div>
                 <div className="flex justify-center gap-4">
-                  <Button variant="outline" onClick={resetForm}>Report Another</Button>
-                  <Button onClick={() => window.location.href = '/dashboard'}>Go to Dashboard</Button>
+                  <Button variant="outline" onClick={resetForm}>{t('report.another_btn')}</Button>
+                  <Button onClick={() => window.location.href = '/dashboard'}>{t('report.dash_btn')}</Button>
                 </div>
               </motion.div>
             )}
