@@ -3,18 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:local": "pnpm --filter @workspace/cyber-safety-hub build && pnpm --filter @workspace/api-server build && pnpm --filter @workspace/api-server start",
-    "portal:build": "pnpm --filter @workspace/cyber-safety-hub build && pnpm --filter @workspace/cyber-surakshit-video build",
-    "portal:start": "node backend/server.js",
-    "portal": "pnpm run portal:build && pnpm run portal:start",
-    "start": "cd artifacts/api-server && cross-env PORT=5000 pnpm run build && pnpm run start",
-    "dev": "concurrently \"pnpm run dev:frontend\" \"pnpm run dev:video\" \"pnpm run dev:api\"",
-    "dev:frontend": "cd artifacts/cyber-safety-hub && cross-env PORT=3000 BASE_PATH='/' pnpm run dev",
-    "dev:video": "cd artifacts/cyber-surakshit-video && cross-env PORT=3001 BASE_PATH='/video/' pnpm run dev",
-    "dev:api": "cd artifacts/api-server && cross-env PORT=5000 pnpm run dev",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    "build": "cd artifacts/cyber-safety-hub && npm run build && cd ../cyber-surakshit-video && npm run build",
+    "start": "cd backend && node server.js",
+    "dev:frontend": "cd artifacts/cyber-safety-hub && npx vite --host 0.0.0.0",
+    "dev:backend": "cd backend && node server.js",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "deploy:build": "npm run build && echo Build complete!"
   },
   "private": true,
   "devDependencies": {

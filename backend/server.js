@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import OpenAI from 'openai';
 import admin from 'firebase-admin';
 
@@ -19,7 +18,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
-const FRONTEND_DEV_URL = 'http://localhost:5173';
 
 // ========== FIREBASE ADMIN INIT ==========
 let db = null;
@@ -52,43 +50,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
 });
 const openaiReady = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'dummy_key';
-
-// ========== PROXY TO FRONTEND DEV SERVER (Development Mode) ==========
-// Set USE_DEV_PROXY=true to proxy to Vite dev server instead of dist
-const USE_DEV_PROXY = process.env.USE_DEV_PROXY === 'true' || process.env.NODE_ENV !== 'production';
-
-const hubDistPath = path.resolve(__dirname, '../artifacts/cyber-safety-hub/dist/public');
-const frontendDistExists = fs.existsSync(path.join(hubDistPath, 'index.html'));
-
-if (USE_DEV_PROXY) {
-  console.log('🔄 Development mode: Proxying frontend to', FRONTEND_DEV_URL);
-  console.log('   (Set USE_DEV_PROXY=false to serve from dist)');
-  
-  // Proxy all non-API requests to Vite dev server
-  app.use('/', createProxyMiddleware({
-    target: FRONTEND_DEV_URL,
-    changeOrigin: true,
-    ws: true, // Enable WebSocket for HMR
-    logLevel: 'warn',
-    onProxyReq: (proxyReq, req, res) => {
-      // Add original URL to headers for debugging
-      proxyReq.setHeader('X-Original-URL', req.originalUrl);
-    }
-  }));
-} else if (frontendDistExists) {
-  console.log('📦 Production mode: Serving frontend from dist folder');
-  
-  // Serve static files from dist
-  app.use(express.static(hubDistPath));
-} else {
-  console.log('⚠️  Frontend dist not found and USE_DEV_PROXY is false');
-  console.log('   Run: cd artifacts/cyber-safety-hub && npm run build');
-}
-
-const videoDistPath = path.resolve(__dirname, '../artifacts/cyber-surakshit-video/dist/public');
-if (fs.existsSync(videoDistPath)) {
-  app.use('/cyber-surakshit-video', express.static(videoDistPath));
-}
 
 // ========== MOCK DATABASE (Fallback) ==========
 const mockDatabase = {
@@ -150,7 +111,9 @@ async function saveUserProgress(userId, progressData) {
   return true;
 }
 
-// ========== API ROUTES ==========
+// ==========================================================
+//  API ROUTES — Must be defined BEFORE static file serving
+// ==========================================================
 
 // 1. HEALTH CHECK
 app.get('/api/health', (req, res) => {
@@ -175,19 +138,12 @@ app.post('/api/auth/signup', async (req, res) => {
     if (firebaseAvailable && auth) {
       const userRecord = await auth.createUser({ email, password, displayName });
       const userData = {
-        uid: userRecord.uid,
-        email,
-        name: displayName,
-        mobile: mobile || '',
-        location: location || '',
-        createdAt: new Date().toISOString(),
-        level: 'Beginner',
-        xp: 0,
-        badges: []
+        uid: userRecord.uid, email, name: displayName,
+        mobile: mobile || '', location: location || '',
+        createdAt: new Date().toISOString(), level: 'Beginner', xp: 0, badges: []
       };
       if (db) {
         await db.collection('users').doc(userRecord.uid).set(userData);
-        // Initialise progress
         await db.collection('users').doc(userRecord.uid).collection('progress').doc('data').set({
           userId: userRecord.uid, level: 'Beginner', xp: 0, xpToNext: 500,
           badges: [], completedModules: [], streak: 0, totalReports: 0, accuracy: 0
@@ -215,7 +171,6 @@ app.post('/api/auth/login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
-
   try {
     if (firebaseAvailable && auth) {
       const user = await auth.getUserByEmail(email);
@@ -238,7 +193,6 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/scan', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'Text is required for scanning.' });
-
   try {
     if (openaiReady) {
       const response = await openai.chat.completions.create({
@@ -249,14 +203,12 @@ app.post('/api/scan', async (req, res) => {
         ],
         response_format: { type: 'json_object' }
       });
-      const result = JSON.parse(response.choices[0].message.content);
-      return res.json(result);
+      return res.json(JSON.parse(response.choices[0].message.content));
     } else {
       const keywords = ['urgent', 'win', 'click', 'verify', 'blocked', 'suspended', 'prize', 'otp', 'kyc'];
       const isScam = keywords.some(k => text.toLowerCase().includes(k));
       res.json({
-        isScam,
-        threatLevel: isScam ? 'High' : 'Low',
+        isScam, threatLevel: isScam ? 'High' : 'Low',
         analysis: isScam ? 'Suspicious keywords detected typical of phishing.' : 'No immediate threats detected.',
         source: 'Mock Scanner'
       });
@@ -271,45 +223,31 @@ app.post('/api/scan', async (req, res) => {
 app.post('/api/scan-screenshot', async (req, res) => {
   const { image } = req.body;
   if (!image) return res.status(400).json({ error: 'Image data is required.' });
-
   try {
     if (openaiReady) {
       const response = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          {
-            role: 'system',
-            content: `You are a cybersecurity expert. Analyze the screenshot for scam indicators. 
-Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low/Medium/High", "category": "string (e.g. Phishing/OTP Fraud/Job Scam/Safe)", "summary": "string", "recommendations": ["string"]}`
-          },
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
-              { type: 'image_url', image_url: { url: image } }
-            ]
-          }
+          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "recommendations": ["string"]}' },
+          { role: 'user', content: [
+            { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
+            { type: 'image_url', image_url: { url: image } }
+          ]}
         ],
-        response_format: { type: 'json_object' },
-        max_tokens: 800
+        response_format: { type: 'json_object' }, max_tokens: 800
       });
-      const result = JSON.parse(response.choices[0].message.content);
-      return res.json(result);
+      return res.json(JSON.parse(response.choices[0].message.content));
     } else {
-      // Mock analysis
       const mockCategories = ['Phishing', 'OTP Fraud', 'Job Scam', 'Safe'];
       const isScam = Math.random() > 0.4;
       res.json({
-        isScam,
-        confidence: isScam ? 0.85 + Math.random() * 0.1 : 0.15 + Math.random() * 0.15,
+        isScam, confidence: isScam ? 0.85 + Math.random() * 0.1 : 0.15 + Math.random() * 0.15,
         threatLevel: isScam ? 'High' : 'Low',
         category: isScam ? mockCategories[Math.floor(Math.random() * 3)] : 'Safe',
-        summary: isScam
-          ? 'This screenshot contains indicators of a scam including urgency-based language, suspicious URLs, and requests for personal information.'
-          : 'No significant threat indicators found in this image. The content appears to be legitimate.',
+        summary: isScam ? 'This screenshot contains indicators of a scam.' : 'No significant threat indicators found.',
         recommendations: isScam
-          ? ['Do not click any links in this message.', 'Block the sender immediately.', 'Report to your bank if financial details are mentioned.', 'Report this scam on the CyberAngel platform.']
-          : ['The message appears safe, but always stay cautious.', 'Verify sender identity through official channels.'],
+          ? ['Do not click any links.', 'Block the sender.', 'Report to your bank if financial details are mentioned.']
+          : ['The message appears safe.', 'Verify sender identity through official channels.'],
         source: 'Mock Scanner'
       });
     }
@@ -323,20 +261,18 @@ Return JSON: {"isScam": boolean, "confidence": number (0-1), "threatLevel": "Low
 app.post('/api/chat', async (req, res) => {
   const { message, history = [] } = req.body;
   if (!message) return res.status(400).json({ error: 'Message is required.' });
-
   try {
     if (openaiReady) {
       const response = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
           { role: 'system', content: 'You are CyberAngel AI, a helpful cybersecurity assistant for Indian users. Help identify scams, explain security concepts simply in context of India (UPI, Aadhaar, PAN, etc.), and provide actionable advice. Keep answers concise and friendly.' },
-          ...history,
-          { role: 'user', content: message }
+          ...history, { role: 'user', content: message }
         ]
       });
       res.json({ reply: response.choices[0].message.content });
     } else {
-      res.json({ reply: `I understand your concern about "${message.substring(0, 30)}...". Always verify sender identity before clicking links or sharing information. If in doubt, contact your bank directly.`, source: 'Mock AI' });
+      res.json({ reply: `I understand your concern about "${message.substring(0, 30)}...". Always verify sender identity before clicking links or sharing information.`, source: 'Mock AI' });
     }
   } catch (error) {
     console.error('Chat error:', error);
@@ -348,25 +284,17 @@ app.post('/api/chat', async (req, res) => {
 app.post('/api/reports', async (req, res) => {
   const { type, content, description, userEmail, attachmentUrl } = req.body;
   if (!type || !content) return res.status(400).json({ error: 'Type and content are required.' });
-
   const newReport = {
-    id: Date.now().toString(),
-    type, content, description,
-    userEmail: userEmail || 'anonymous',
-    attachmentUrl,
-    status: 'pending_review',
-    createdAt: new Date().toISOString()
+    id: Date.now().toString(), type, content, description,
+    userEmail: userEmail || 'anonymous', attachmentUrl,
+    status: 'pending_review', createdAt: new Date().toISOString()
   };
-
   if (firebaseAvailable && db) {
     try {
       await db.collection('reports').doc(newReport.id).set(newReport);
       return res.status(201).json({ message: 'Report submitted.', reportId: newReport.id });
-    } catch (error) {
-      console.error('Firebase error:', error);
-    }
+    } catch (error) { console.error('Firebase error:', error); }
   }
-
   mockDatabase.reports.push(newReport);
   res.status(201).json({ message: 'Report submitted.', reportId: newReport.id });
 });
@@ -379,9 +307,7 @@ app.get('/api/reports', async (req, res) => {
       snapshot.forEach(doc => reports.push({ id: doc.id, ...doc.data() }));
       return res.json(reports);
     }
-  } catch (error) {
-    console.error('Firebase error:', error);
-  }
+  } catch (error) { console.error('Firebase error:', error); }
   res.json(mockDatabase.reports);
 });
 
@@ -396,9 +322,7 @@ app.get('/api/lessons', async (req, res) => {
         return res.json(lessons);
       }
     }
-  } catch (error) {
-    console.error('Firebase error:', error);
-  }
+  } catch (error) { console.error('Firebase error:', error); }
   res.json(mockDatabase.lessons);
 });
 
@@ -413,9 +337,7 @@ app.get('/api/trainer/scenarios', async (req, res) => {
         return res.json(scenarios);
       }
     }
-  } catch (error) {
-    console.error('Firebase error:', error);
-  }
+  } catch (error) { console.error('Firebase error:', error); }
   res.json(mockDatabase.trainerScenarios);
 });
 
@@ -424,10 +346,8 @@ app.post('/api/trainer/submit', async (req, res) => {
   if (!userId || !scenarioId || userAnswer === undefined) {
     return res.status(400).json({ error: 'Required fields missing.' });
   }
-
   const isCorrect = userAnswer === correctAnswer;
   const xpGained = isCorrect ? 10 : 0;
-
   try {
     const progress = await getUserProgress(userId);
     progress.xp = (progress.xp || 0) + xpGained;
@@ -457,18 +377,15 @@ app.post('/api/user/progress', async (req, res) => {
   if (!moduleId || typeof xpGained !== 'number') {
     return res.status(400).json({ error: 'Required fields missing.' });
   }
-
   const uid = userId || 'default';
   try {
     const progress = await getUserProgress(uid);
     progress.xp = (progress.xp || 0) + xpGained;
     progress.completedModules = [...new Set([...(progress.completedModules || []), moduleId])];
-
     if (progress.xp >= (progress.xpToNext || 500)) {
       progress.level = 'Expert';
       progress.xpToNext = 1000;
     }
-
     await saveUserProgress(uid, progress);
     res.json({ success: true, newXp: progress.xp, newLevel: progress.level });
   } catch (error) {
@@ -488,9 +405,7 @@ app.get('/api/alerts', async (req, res) => {
         return res.json(alerts);
       }
     }
-  } catch (error) {
-    console.error('Firebase error:', error);
-  }
+  } catch (error) { console.error('Firebase error:', error); }
   res.json(mockDatabase.alerts);
 });
 
@@ -501,15 +416,10 @@ app.get('/api/dashboard', async (req, res) => {
     const userProgress = await getUserProgress(userId);
     res.json({
       userStats: {
-        level: userProgress.level,
-        xp: userProgress.xp,
-        xpToNext: userProgress.xpToNext,
-        modulesCompleted: (userProgress.completedModules || []).length,
-        totalModules: 12,
-        badges: userProgress.badges || [],
-        totalReports: userProgress.totalReports || 0,
-        reportsSubmitted: userProgress.totalReports || 0,
-        accuracy: userProgress.accuracy || 0
+        level: userProgress.level, xp: userProgress.xp, xpToNext: userProgress.xpToNext,
+        modulesCompleted: (userProgress.completedModules || []).length, totalModules: 12,
+        badges: userProgress.badges || [], totalReports: userProgress.totalReports || 0,
+        reportsSubmitted: userProgress.totalReports || 0, accuracy: userProgress.accuracy || 0
       },
       scamTrends: [
         { name: 'Mon', Phishing: 4000, OTP: 2400, Job: 2400 },
@@ -521,12 +431,9 @@ app.get('/api/dashboard', async (req, res) => {
         { name: 'Sun', Phishing: 3490, OTP: 4300, Job: 2100 }
       ],
       reportsData: [
-        { month: 'Jan', reports: 120 },
-        { month: 'Feb', reports: 150 },
-        { month: 'Mar', reports: 220 },
-        { month: 'Apr', reports: 180 },
-        { month: 'May', reports: 290 },
-        { month: 'Jun', reports: 350 }
+        { month: 'Jan', reports: 120 }, { month: 'Feb', reports: 150 },
+        { month: 'Mar', reports: 220 }, { month: 'Apr', reports: 180 },
+        { month: 'May', reports: 290 }, { month: 'Jun', reports: 350 }
       ]
     });
   } catch (error) {
@@ -535,24 +442,30 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
-// ========== SPA FALLBACK ==========
-// Only needed if serving from dist, otherwise proxy handles everything
-app.get('/{*splat}', (req, res, next) => {
-  // Skip API routes
-  if (req.path.startsWith('/api') || req.path.startsWith('/cyber-surakshit-video')) {
-    return next();
-  }
-  
-  // If frontend dist exists, serve SPA
+// ==========================================================
+//  STATIC FILE SERVING (Production) — After all API routes
+// ==========================================================
+const hubDistPath = path.resolve(__dirname, '../artifacts/cyber-safety-hub/dist/public');
+const videoDistPath = path.resolve(__dirname, '../artifacts/cyber-surakshit-video/dist/public');
+
+// Serve video module static files
+if (fs.existsSync(videoDistPath)) {
+  app.use('/cyber-surakshit-video', express.static(videoDistPath));
+}
+
+// Serve main frontend static files
+const frontendDistExists = fs.existsSync(path.join(hubDistPath, 'index.html'));
+if (frontendDistExists) {
+  app.use(express.static(hubDistPath));
+}
+
+// SPA fallback — send index.html for all non-API routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) return res.status(404).json({ error: 'API route not found' });
   if (frontendDistExists) {
-    const indexPath = path.join(hubDistPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
+    return res.sendFile(path.join(hubDistPath, 'index.html'));
   }
-  
-  // Otherwise proxy handles it
-  next();
+  res.status(200).send('CyberAngel API is running. Build the frontend with: cd artifacts/cyber-safety-hub && npm run build');
 });
 
 // ========== ERROR HANDLING & SERVER START ==========
@@ -565,7 +478,7 @@ app.listen(PORT, () => {
   console.log(`\n✅ CyberAngel Unified Portal running on http://localhost:${PORT}`);
   console.log(`📊 Database: ${firebaseAvailable ? 'Firebase (cyberangle)' : 'Mock Database'}`);
   console.log(`🤖 OpenAI: ${openaiReady ? 'Enabled' : 'Mock mode'}`);
-  console.log(`\n🌐 Frontend: http://localhost:${PORT}/`);
+  console.log(`🌐 Frontend: http://localhost:${PORT}/`);
   console.log(`🎬 Video:    http://localhost:${PORT}/cyber-surakshit-video/`);
   console.log(`📡 API:      http://localhost:${PORT}/api/health`);
 });
