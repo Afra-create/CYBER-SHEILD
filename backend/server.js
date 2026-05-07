@@ -193,25 +193,34 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/scan', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'Text is required for scanning.' });
+  const generateMockTextResponse = () => {
+    const keywords = ['urgent', 'win', 'click', 'verify', 'blocked', 'suspended', 'prize', 'otp', 'kyc'];
+    const isScam = keywords.some(k => text.toLowerCase().includes(k));
+    return {
+      isScam, threatLevel: isScam ? 'High' : 'Low',
+      analysis: isScam ? 'Suspicious keywords detected typical of phishing.' : 'No immediate threats detected.',
+      source: 'Mock Scanner (OpenAI Quota Exceeded/Unavailable)'
+    };
+  };
+
   try {
     if (openaiReady) {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: 'You are a cybersecurity expert. Analyze the following text and determine if it is a scam. Respond with JSON: {"isScam": boolean, "threatLevel": "Low/Medium/High", "analysis": "string"}' },
-          { role: 'user', content: text }
-        ],
-        response_format: { type: 'json_object' }
-      });
-      return res.json(JSON.parse(response.choices[0].message.content));
+      try {
+        const response = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: 'You are a cybersecurity expert. Analyze the following text and determine if it is a scam. Respond with JSON: {"isScam": boolean, "threatLevel": "Low/Medium/High", "analysis": "string"}' },
+            { role: 'user', content: text }
+          ],
+          response_format: { type: 'json_object' }
+        });
+        return res.json(JSON.parse(response.choices[0].message.content));
+      } catch (openAiError) {
+        console.error('OpenAI API Error:', openAiError.message);
+        return res.json(generateMockTextResponse());
+      }
     } else {
-      const keywords = ['urgent', 'win', 'click', 'verify', 'blocked', 'suspended', 'prize', 'otp', 'kyc'];
-      const isScam = keywords.some(k => text.toLowerCase().includes(k));
-      res.json({
-        isScam, threatLevel: isScam ? 'High' : 'Low',
-        analysis: isScam ? 'Suspicious keywords detected typical of phishing.' : 'No immediate threats detected.',
-        source: 'Mock Scanner'
-      });
+      return res.json(generateMockTextResponse());
     }
   } catch (error) {
     console.error('Scan error:', error);
@@ -224,55 +233,62 @@ app.post('/api/scan-screenshot', async (req, res) => {
   const { image } = req.body;
   if (!image) return res.status(400).json({ error: 'Image data is required.' });
   
+  const generateMockResponse = () => {
+    const mockCategories = ['Phishing', 'OTP Fraud', 'Job Scam', 'Safe'];
+    const isScam = Math.random() > 0.4;
+    return {
+      isScam, confidence: isScam ? 0.85 + Math.random() * 0.1 : 0.15 + Math.random() * 0.15,
+      threatLevel: isScam ? 'High' : 'Low',
+      category: isScam ? mockCategories[Math.floor(Math.random() * 3)] : 'Safe',
+      summary: isScam ? 'This screenshot contains indicators of a scam.' : 'No significant threat indicators found.',
+      redFlags: isScam 
+        ? ['Generic greeting used instead of your name.', 'Grammatical errors in the text.', 'Sense of false urgency created.']
+        : [],
+      recommendations: isScam
+        ? ['Do not click any links.', 'Block the sender.', 'Report to your bank if financial details are mentioned.']
+        : ['The message appears safe.', 'Verify sender identity through official channels.'],
+      source: 'Mock Scanner (OpenAI Quota Exceeded/Unavailable)'
+    };
+  };
+
   try {
     if (openaiReady) {
       console.log('Sending screenshot to OpenAI...');
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return ONLY a valid JSON object: {"isScam": boolean, "confidence": number, "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "redFlags": ["string"], "recommendations": ["string"]}' },
-          { role: 'user', content: [
-            { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
-            { type: 'image_url', image_url: { url: image } }
-          ]}
-        ],
-        response_format: { type: 'json_object' },
-        max_tokens: 800
-      });
-
-      const content = response.choices[0].message.content;
-      console.log('OpenAI Response received');
-      
       try {
-        const parsedData = JSON.parse(content);
-        return res.json(parsedData);
-      } catch (parseError) {
-        console.error('Failed to parse OpenAI JSON:', content);
-        throw new Error('Invalid AI response format');
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a cybersecurity expert. Analyze the screenshot for scam indicators. Return ONLY a valid JSON object: {"isScam": boolean, "confidence": number, "threatLevel": "Low/Medium/High", "category": "string", "summary": "string", "redFlags": ["string"], "recommendations": ["string"]}' },
+            { role: 'user', content: [
+              { type: 'text', text: 'Analyze this screenshot for scam/phishing patterns.' },
+              { type: 'image_url', image_url: { url: image } }
+            ]}
+          ],
+          response_format: { type: 'json_object' },
+          max_tokens: 800
+        });
+
+        const content = response.choices[0].message.content;
+        console.log('OpenAI Response received');
+        
+        try {
+          const parsedData = JSON.parse(content);
+          return res.json(parsedData);
+        } catch (parseError) {
+          console.error('Failed to parse OpenAI JSON:', content);
+          return res.json(generateMockResponse());
+        }
+      } catch (openAiError) {
+        console.error('OpenAI API Error:', openAiError.message);
+        console.log('Falling back to mock scanner due to API error.');
+        return res.json(generateMockResponse());
       }
     } else {
-      // Fallback mock logic...
-      const mockCategories = ['Phishing', 'OTP Fraud', 'Job Scam', 'Safe'];
-      const isScam = Math.random() > 0.4;
-      res.json({
-        isScam, confidence: isScam ? 0.85 + Math.random() * 0.1 : 0.15 + Math.random() * 0.15,
-        threatLevel: isScam ? 'High' : 'Low',
-        category: isScam ? mockCategories[Math.floor(Math.random() * 3)] : 'Safe',
-        summary: isScam ? 'This screenshot contains indicators of a scam.' : 'No significant threat indicators found.',
-        redFlags: isScam 
-          ? ['Generic greeting used instead of your name.', 'Grammatical errors in the text.', 'Sense of false urgency created.']
-          : [],
-        recommendations: isScam
-          ? ['Do not click any links.', 'Block the sender.', 'Report to your bank if financial details are mentioned.']
-          : ['The message appears safe.', 'Verify sender identity through official channels.'],
-        source: 'Mock Scanner'
-      });
+      console.log('OpenAI not configured. Using mock scanner.');
+      return res.json(generateMockResponse());
     }
   } catch (error) {
     console.error('Screenshot scan error:', error.message);
-    if (error.response) {
-      console.error('OpenAI Error Details:', error.response.data);
-    }
     res.status(500).json({ error: 'Failed to analyze screenshot: ' + error.message });
   }
 });
