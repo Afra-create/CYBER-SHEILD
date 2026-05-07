@@ -6,8 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import CyberMatrixHero from "@/components/ui/cyber-matrix-hero";
-import SplashScreen from "@/components/splash-screen/SplashScreen";
-import { useSplash } from "@/components/splash-screen/useSplash";
+
 
 // Pages
 import Home from "@/pages/home";
@@ -52,13 +51,12 @@ function Router() {
 }
 
 function App() {
-  const { showSplash, handleSplashComplete } = useSplash();
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="cyber-safety-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          {showSplash && <SplashScreen duration={1500} onComplete={handleSplashComplete} />}
+
           <CyberMatrixHero />
           <AppLayout>
             <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>

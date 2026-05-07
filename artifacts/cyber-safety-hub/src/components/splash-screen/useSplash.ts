@@ -1,12 +1,9 @@
 import { useState } from "react";
 
 export function useSplash() {
-  const [showSplash, setShowSplash] = useState<boolean>(() => {
-    return !sessionStorage.getItem("splashShown");
-  });
+  const [showSplash, setShowSplash] = useState<boolean>(true);
 
   const handleSplashComplete = () => {
-    sessionStorage.setItem("splashShown", "true");
     setShowSplash(false);
   };
 
